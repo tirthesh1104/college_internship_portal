@@ -2715,7 +2715,7 @@
     "active_provider": "GEMINI",
     "gemini": {
       "api_key": "",
-      "selected_model": "gemini-3.8-flash",
+      "selected_model": "gemini-2.0-flash",
       "is_connected": true,
       "last_tested_at": "2026-10-29T05:46:14.410Z",
       "error_message": ""

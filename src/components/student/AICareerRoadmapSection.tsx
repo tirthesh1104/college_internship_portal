@@ -295,7 +295,7 @@ Format the response clearly into 3 phases:
         rawText: text,
         phases,
         provider: res.provider || 'Google Gemini',
-        model: res.model || 'gemini-3.8-flash',
+        model: res.model || 'gemini-2.0-flash',
         isLocalFallback: false,
         assumptionsAndMissingFields: missingProfileFields,
         generatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })

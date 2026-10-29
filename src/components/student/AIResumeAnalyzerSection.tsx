@@ -304,7 +304,7 @@ Perform an accurate ATS & technical requirement comparison based strictly on the
         missingSkills: localBaseline.missingSkills,
         recommendations: localBaseline.recommendations,
         provider: res.provider || 'Google Gemini',
-        model: res.model || 'gemini-3.8-flash',
+        model: res.model || 'gemini-2.0-flash',
         isLocalFallback: false,
         opportunityTitle: opp ? `${opp.title} (${opp.organization})` : 'Custom Internship Requirement',
         missingDataWarnings: localBaseline.missingDataWarnings

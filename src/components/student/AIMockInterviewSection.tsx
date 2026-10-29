@@ -408,7 +408,7 @@ Model Answer Summary: [Ideal concise technical answer]`;
         rawText: text,
         score: Math.min(100, Math.max(0, extractedScore)),
         provider: res.provider || 'Google Gemini',
-        model: res.model || 'gemini-3.8-flash',
+        model: res.model || 'gemini-2.0-flash',
         isLocalFallback: false
       });
     } catch {

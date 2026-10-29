@@ -41,7 +41,7 @@ export const AISettings: React.FC = () => {
   // Gemini state
   const [geminiKeyInput, setGeminiKeyInput] = useState('');
   const [showGeminiKey, setShowGeminiKey] = useState(false);
-  const [geminiModel, setGeminiModel] = useState('gemini-3.8-flash');
+  const [geminiModel, setGeminiModel] = useState('gemini-2.0-flash');
   const [testingGemini, setTestingGemini] = useState(false);
 
   // Claude state
@@ -64,7 +64,7 @@ export const AISettings: React.FC = () => {
       setActiveProvider(data.active_provider === 'CLAUDE' ? 'CLAUDE' : 'GEMINI');
       setFallbackEnabled(data.fallback_enabled);
 
-      setGeminiModel(data.gemini.selected_model || 'gemini-3.8-flash');
+      setGeminiModel(data.gemini.selected_model || 'gemini-2.0-flash');
       if (data.gemini.api_key_masked) {
         setGeminiKeyInput(data.gemini.api_key_masked);
       }
@@ -289,7 +289,7 @@ export const AISettings: React.FC = () => {
                   Google Gemini API
                 </div>
                 <div style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginTop: '4px', lineHeight: 1.4 }}>
-                  Fast inference with Gemini 3.8 Flash &amp; Gemini 4 Argon. Recommended for full-stack analysis and high-throughput student queries.
+                  Fast inference with Gemini 2.0 Flash &amp; Gemini 1.5 Pro. Recommended for full-stack analysis and high-throughput student queries.
                 </div>
               </div>
             </label>
