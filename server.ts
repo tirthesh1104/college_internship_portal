@@ -256,19 +256,19 @@ function isLegacyInvalidKey(key?: string): boolean {
 }
 
 function getDefaultAIConfig(): AIConfigData {
-  const defaultGeminiKey = (process.env.GEMINI_API_KEY || '').trim();
-  const defaultClaudeKey = (process.env.ANTHROPIC_API_KEY || '').trim();
+  const hasGemini = Boolean((process.env.GEMINI_API_KEY || '').trim());
+  const hasClaude = Boolean((process.env.ANTHROPIC_API_KEY || '').trim());
   return {
     active_provider: 'GEMINI',
     gemini: {
-      api_key: defaultGeminiKey,
+      api_key: '',
       selected_model: 'gemini-3.1-flash-lite',
-      is_connected: Boolean(defaultGeminiKey)
+      is_connected: hasGemini
     },
     claude: {
-      api_key: defaultClaudeKey,
+      api_key: '',
       selected_model: 'claude-3-5-sonnet-20241022',
-      is_connected: Boolean(defaultClaudeKey)
+      is_connected: hasClaude
     },
     fallback_enabled: true
   };
@@ -1149,28 +1149,21 @@ function loadStore(): DataStore {
         parsed.ai_config = getDefaultAIConfig();
         modified = true;
       } else {
-        if (
-          isLegacyInvalidKey(parsed.ai_config.gemini?.api_key) ||
-          (process.env.GEMINI_API_KEY && parsed.ai_config.gemini?.api_key !== process.env.GEMINI_API_KEY)
-        ) {
-          parsed.ai_config.gemini = {
-            ...(parsed.ai_config.gemini || {}),
-            api_key: (process.env.GEMINI_API_KEY || '').trim(),
-            selected_model: parsed.ai_config.gemini?.selected_model || 'gemini-3.1-flash-lite',
-            is_connected: Boolean(process.env.GEMINI_API_KEY)
-          };
+        // Enforce zero raw secrets stored in database json on disk
+        if (parsed.ai_config.gemini?.api_key) {
+          parsed.ai_config.gemini.api_key = '';
           modified = true;
         }
-        if (isLegacyInvalidKey(parsed.ai_config.claude?.api_key)) {
-          parsed.ai_config.claude = {
-            ...(parsed.ai_config.claude || {}),
-            api_key: (process.env.ANTHROPIC_API_KEY || '').trim(),
-            selected_model: parsed.ai_config.claude?.selected_model || 'claude-3-5-sonnet-20241022',
-            is_connected: Boolean(process.env.ANTHROPIC_API_KEY),
-            error_message: ''
-          };
+        if (parsed.ai_config.claude?.api_key) {
+          parsed.ai_config.claude.api_key = '';
           modified = true;
         }
+        if (!parsed.ai_config.gemini?.selected_model) {
+          parsed.ai_config.gemini.selected_model = 'gemini-3.1-flash-lite';
+          modified = true;
+        }
+        parsed.ai_config.gemini.is_connected = Boolean(process.env.GEMINI_API_KEY || parsed.ai_config.gemini.is_connected);
+        parsed.ai_config.claude.is_connected = Boolean(process.env.ANTHROPIC_API_KEY || parsed.ai_config.claude.is_connected);
       }
 
       parsed.users.forEach((u: any) => {
