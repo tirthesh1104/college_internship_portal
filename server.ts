@@ -20,13 +20,16 @@ const DATA_FILE = path.join(DATA_DIR, 'db_store.json');
 
 // Server-side Security PINs (Never exposed in frontend code)
 const COORDINATOR_SECURITY_PIN = process.env.COORDINATOR_SECURITY_PIN || '77';
-const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || (
-  process.env.NODE_ENV === 'production'
-    ? crypto.randomBytes(32).toString('hex')
-    : 'ipts_dev_signing_secret_do_not_use_in_prod'
-);
-if (!process.env.TOKEN_SIGNING_SECRET && process.env.NODE_ENV === 'production') {
-  console.warn('[SECURITY] Warning: TOKEN_SIGNING_SECRET is not configured in environment variables.');
+function getTokenSigningSecret(): string {
+  const secret = (process.env.TOKEN_SIGNING_SECRET || '').trim();
+  if (secret) return secret;
+  if (IS_VERCEL || process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'CRITICAL_SECURITY_CONFIGURATION_ERROR: TOKEN_SIGNING_SECRET is missing in production. ' +
+      'Please configure a strong TOKEN_SIGNING_SECRET in Vercel Project Settings → Environment Variables.'
+    );
+  }
+  return 'ipts_local_dev_only_signing_secret_not_for_production';
 }
 
 // Note: A 1-4 digit numeric PIN has low entropy (max 10,000 combinations).
@@ -116,18 +119,27 @@ const KV_URL = (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_UR
 const KV_TOKEN = (process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '').trim();
 const HAS_DURABLE_STORAGE = Boolean(KV_URL && KV_TOKEN);
 let durableStoreLoaded = false;
+let pendingSavePromise: Promise<void> | null = null;
 
 async function syncFromRemoteStorage(): Promise<boolean> {
   if (!HAS_DURABLE_STORAGE) return false;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
   try {
     const res = await fetch(`${KV_URL}/get/ipts_db_store`, {
       headers: { Authorization: `Bearer ${KV_TOKEN}` },
+      signal: controller.signal
     });
     if (res.ok) {
       const json: any = await res.json();
       if (json && json.result) {
-        const remoteData = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
-        if (remoteData && Array.isArray(remoteData.users)) {
+        let remoteData = json.result;
+        if (typeof remoteData === 'string') {
+          try {
+            remoteData = JSON.parse(remoteData);
+          } catch (_) {}
+        }
+        if (remoteData && Array.isArray(remoteData.users) && remoteData.users.length > 0) {
           memoryStore = remoteData;
           durableStoreLoaded = true;
           try {
@@ -143,25 +155,36 @@ async function syncFromRemoteStorage(): Promise<boolean> {
         return true;
       }
     }
-  } catch (err) {
-    console.warn('[STORAGE] Failed to sync from remote KV store:', err);
+  } catch (err: any) {
+    console.warn('[STORAGE] Failed to sync from remote KV store:', err.message || err);
+  } finally {
+    clearTimeout(timer);
   }
   return false;
 }
 
 async function syncToRemoteStorage(store: any): Promise<void> {
   if (!HAS_DURABLE_STORAGE) return;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
   try {
-    await fetch(`${KV_URL}/set/ipts_db_store`, {
+    const serialized = JSON.stringify(store);
+    const res = await fetch(`${KV_URL}/set/ipts_db_store`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${KV_TOKEN}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(store)
+      body: JSON.stringify(serialized),
+      signal: controller.signal
     });
-  } catch (err) {
-    console.warn('[STORAGE] Failed to write to remote KV store:', err);
+    if (!res.ok) {
+      console.warn(`[STORAGE] Remote KV write failed with HTTP ${res.status}: ${res.statusText}`);
+    }
+  } catch (err: any) {
+    console.warn('[STORAGE] Failed to write to remote KV store:', err.message || err);
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -170,6 +193,23 @@ app.use(async (_req: Request, _res: Response, next: NextFunction) => {
   if (HAS_DURABLE_STORAGE && !durableStoreLoaded) {
     await syncFromRemoteStorage();
   }
+  next();
+});
+
+// Response wrapper to ensure remote persistence writes complete before serverless response terminates
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  const originalJson = res.json.bind(res);
+  res.json = function (body: any) {
+    if (pendingSavePromise) {
+      const promise = pendingSavePromise;
+      pendingSavePromise = null;
+      promise.finally(() => {
+        originalJson(body);
+      });
+      return this;
+    }
+    return originalJson(body);
+  };
   next();
 });
 
@@ -1283,9 +1323,7 @@ function saveStore(store: DataStore) {
     console.warn('[DB] Non-fatal: write to disk skipped in serverless environment:', err);
   }
   if (HAS_DURABLE_STORAGE) {
-    syncToRemoteStorage(store).catch((err) => {
-      console.warn('[STORAGE] Async remote persistence failed:', err);
-    });
+    pendingSavePromise = syncToRemoteStorage(store);
   }
 }
 
@@ -1342,6 +1380,7 @@ function addAuditLog(
 }
 
 function createToken(user: UserRecord): string {
+  const secret = getTokenSigningSecret();
   const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
   const payload = Buffer.from(JSON.stringify({
     user_id: user.id,
@@ -1350,7 +1389,7 @@ function createToken(user: UserRecord): string {
     exp: Math.floor(Date.now() / 1000) + 86400
   })).toString('base64url');
   const signature = crypto
-    .createHmac('sha256', TOKEN_SIGNING_SECRET)
+    .createHmac('sha256', secret)
     .update(`${header}.${payload}`)
     .digest('base64url');
   return `${header}.${payload}.${signature}`;
@@ -1363,9 +1402,17 @@ function getAuthUser(req: Request): UserRecord | null {
   const parts = token.split('.');
   if (parts.length !== 3) return null;
 
+  let secret: string;
+  try {
+    secret = getTokenSigningSecret();
+  } catch (err: any) {
+    console.error('[AUTH_SECURITY]', err.message);
+    return null;
+  }
+
   const [header, payloadB64, signature] = parts;
   const expectedSig = crypto
-    .createHmac('sha256', TOKEN_SIGNING_SECRET)
+    .createHmac('sha256', secret)
     .update(`${header}.${payloadB64}`)
     .digest('base64url');
 
@@ -2029,6 +2076,12 @@ function buildStudentSummary(u: UserRecord, store: DataStore): any {
 // ============================================================================
 
 app.post('/api/auth/login/', (req: Request, res: Response) => {
+  try {
+    getTokenSigningSecret();
+  } catch (configErr: any) {
+    return res.status(500).json({ error: configErr.message });
+  }
+
   const clientIp = req.ip || req.socket.remoteAddress || '127.0.0.1';
   const rateLimit = checkAuthRateLimit(clientIp, 8, 60000);
   if (!rateLimit.allowed) {
