@@ -6466,11 +6466,29 @@ app.get(['/api/github/repos/:username/', '/api/github/repos/:username'], async (
 
 // ==================== FEEDBACK & USER EXPERIENCE MANAGEMENT APIs ====================
 
-const FEEDBACK_UPLOADS_DIR = path.join(__dirname, 'public', 'uploads', 'feedback');
-if (!fs.existsSync(FEEDBACK_UPLOADS_DIR)) {
-  fs.mkdirSync(FEEDBACK_UPLOADS_DIR, { recursive: true });
+// Feedback uploads directory — on Vercel serverless, __dirname (/var/task) is read-only,
+// so use the OS temp directory for uploads. Files stored here are ephemeral and will not
+// persist across serverless invocations without external object storage (e.g., S3).
+const UPLOADS_BASE_DIR = IS_VERCEL ? os.tmpdir() : path.join(__dirname, 'public', 'uploads');
+const FEEDBACK_UPLOADS_DIR = path.join(UPLOADS_BASE_DIR, 'feedback');
+
+try {
+  if (!fs.existsSync(FEEDBACK_UPLOADS_DIR)) {
+    fs.mkdirSync(FEEDBACK_UPLOADS_DIR, { recursive: true });
+  }
+} catch (err) {
+  console.warn('[UPLOADS] Could not create feedback uploads directory:', err);
 }
-app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// Only mount static uploads middleware if the uploads directory actually exists.
+// On serverless without persistent storage, uploaded files are ephemeral.
+try {
+  if (fs.existsSync(UPLOADS_BASE_DIR)) {
+    app.use('/uploads', express.static(path.join(UPLOADS_BASE_DIR, 'uploads')));
+  }
+} catch (err) {
+  console.warn('[UPLOADS] Could not mount static uploads middleware:', err);
+}
 
 const ALLOWED_IMAGE_MIMES: Record<string, string> = {
   'image/png': 'png',
