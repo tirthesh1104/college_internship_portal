@@ -20,7 +20,14 @@ const DATA_FILE = path.join(DATA_DIR, 'db_store.json');
 
 // Server-side Security PINs (Never exposed in frontend code)
 const COORDINATOR_SECURITY_PIN = process.env.COORDINATOR_SECURITY_PIN || '77';
-const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || 'ipts_mitcorer_hmac_secret_2026';
+const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || (
+  process.env.NODE_ENV === 'production'
+    ? crypto.randomBytes(32).toString('hex')
+    : 'ipts_dev_signing_secret_do_not_use_in_prod'
+);
+if (!process.env.TOKEN_SIGNING_SECRET && process.env.NODE_ENV === 'production') {
+  console.warn('[SECURITY] Warning: TOKEN_SIGNING_SECRET is not configured in environment variables.');
+}
 
 // Note: A 1-4 digit numeric PIN has low entropy (max 10,000 combinations).
 // Strong brute-force protection (per-IP rate limiting and audit logging) is enforced.
