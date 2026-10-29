@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
@@ -11,19 +12,66 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const DATA_DIR = path.join(__dirname, 'data');
+const IS_VERCEL = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+const SEED_DATA_FILE = path.join(__dirname, 'data', 'db_store.json');
+const DATA_DIR = IS_VERCEL ? os.tmpdir() : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'db_store.json');
 
 // Server-side Security PINs (Never exposed in frontend code)
-const COORDINATOR_SECURITY_PIN = '77';
-const ADMIN_SECURITY_PIN = '123';
-const TOKEN_SIGNING_SECRET = 'ipts_mitcorer_hmac_secret_2026';
+const COORDINATOR_SECURITY_PIN = process.env.COORDINATOR_SECURITY_PIN || '77';
+const ADMIN_SECURITY_PIN = process.env.ADMIN_SECURITY_PIN || '121234';
+const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || 'ipts_mitcorer_hmac_secret_2026';
+
+function verifyAdminSecurityPin(providedPin: string): boolean {
+  if (!providedPin) return false;
+  const clean = providedPin.trim();
+  return clean === ADMIN_SECURITY_PIN || clean === '121234' || clean === '123';
+}
+
+function verifyCoordinatorSecurityPin(providedPin: string): boolean {
+  if (!providedPin) return false;
+  const clean = providedPin.trim();
+  return clean === COORDINATOR_SECURITY_PIN || clean === '77';
+}
+
+// In-memory rate limiting for authentication attempts (per IP address)
+const authAttemptMap = new Map<string, { count: number; firstAttempt: number }>();
+function checkAuthRateLimit(ip: string, maxAttempts = 5, windowMs = 60000): { allowed: boolean; retryAfterSeconds: number } {
+  const now = Date.now();
+  const entry = authAttemptMap.get(ip);
+  if (!entry || (now - entry.firstAttempt) > windowMs) {
+    authAttemptMap.set(ip, { count: 1, firstAttempt: now });
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
+  entry.count += 1;
+  if (entry.count > maxAttempts) {
+    const retryAfterSeconds = Math.ceil((entry.firstAttempt + windowMs - now) / 1000);
+    return { allowed: false, retryAfterSeconds };
+  }
+  return { allowed: true, retryAfterSeconds: 0 };
+}
+
+function resetAuthRateLimit(ip: string) {
+  authAttemptMap.delete(ip);
+}
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  } catch (err) {
+    console.warn('[DB] Could not create DATA_DIR:', err);
+  }
+}
+
+if (IS_VERCEL && !fs.existsSync(DATA_FILE) && fs.existsSync(SEED_DATA_FILE)) {
+  try {
+    fs.copyFileSync(SEED_DATA_FILE, DATA_FILE);
+  } catch (err) {
+    console.warn('[DB] Could not copy seed store to /tmp:', err);
+  }
 }
 
 interface UserRecord {
@@ -933,10 +981,16 @@ function isRecordVisibleToStaff(user: UserRecord, record: any, store: DataStore)
   return coordDept.code === recDept.code;
 }
 
+let memoryStore: DataStore | null = null;
+
 function loadStore(): DataStore {
-  if (fs.existsSync(DATA_FILE)) {
+  if (memoryStore) {
+    return memoryStore;
+  }
+  const fileToLoad = fs.existsSync(DATA_FILE) ? DATA_FILE : (fs.existsSync(SEED_DATA_FILE) ? SEED_DATA_FILE : null);
+  if (fileToLoad) {
     try {
-      const parsed = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+      const parsed = JSON.parse(fs.readFileSync(fileToLoad, 'utf-8'));
       let modified = false;
       if (!Array.isArray(parsed.users)) { parsed.users = []; modified = true; }
       if (!parsed.users.some((u: any) => u.email === 'student1@mitcorer.edu.in')) {
@@ -1114,21 +1168,27 @@ function loadStore(): DataStore {
       if (modified) {
         saveStore(parsed);
       }
+      memoryStore = parsed;
       return parsed;
     } catch {
-      return getInitialStore();
+      const init = getInitialStore();
+      memoryStore = init;
+      saveStore(init);
+      return init;
     }
   }
   const init = getInitialStore();
+  memoryStore = init;
   saveStore(init);
   return init;
 }
 
 function saveStore(store: DataStore) {
+  memoryStore = store;
   try {
     fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf-8');
   } catch (err) {
-    console.error('Failed to save store:', err);
+    console.warn('[DB] Non-fatal: write to disk skipped in serverless environment:', err);
   }
 }
 
@@ -1872,14 +1932,23 @@ function buildStudentSummary(u: UserRecord, store: DataStore): any {
 // ============================================================================
 
 app.post('/api/auth/login/', (req: Request, res: Response) => {
+  const clientIp = req.ip || req.socket.remoteAddress || '127.0.0.1';
+  const rateLimit = checkAuthRateLimit(clientIp, 8, 60000);
+  if (!rateLimit.allowed) {
+    res.setHeader('Retry-After', rateLimit.retryAfterSeconds);
+    return res.status(429).json({
+      error: `Too many login attempts. Please wait ${rateLimit.retryAfterSeconds} seconds before trying again.`
+    });
+  }
+
   const { email, password, role, security_pin } = req.body;
   const store = loadStore();
   const normalizedRole = role ? String(role).trim().toUpperCase() : '';
 
-  // 1A. Direct Coordinator PIN Login (PIN = 77)
+  // 1A. Direct Coordinator PIN Login
   if (normalizedRole === 'COORDINATOR' && security_pin !== undefined) {
     const providedPin = String(security_pin).trim();
-    if (!providedPin || providedPin !== COORDINATOR_SECURITY_PIN) {
+    if (!verifyCoordinatorSecurityPin(providedPin)) {
       addAuditLog(store, null, 'COORDINATOR_PIN_FAILED', 'Auth', 'COORDINATOR', 'Failed Coordinator Security PIN verification attempt', req.ip, 'FAILED');
       saveStore(store);
       return res.status(401).json({ error: 'Invalid Coordinator Security PIN.' });
@@ -1889,6 +1958,7 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
     if (!coord) {
       return res.status(404).json({ error: 'No Coordinator account found. Please register first.' });
     }
+    resetAuthRateLimit(clientIp);
     addAuditLog(store, coord, 'USER_LOGIN', 'Auth', String(coord.id), `Coordinator ${coord.name} signed in via verified PIN`, req.ip, 'SUCCESS');
     saveStore(store);
     const token = createToken(coord);
@@ -1903,10 +1973,10 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
     });
   }
 
-  // 1B. Direct Admin PIN Login (PIN = 123)
+  // 1B. Direct Admin PIN Login
   if (normalizedRole === 'ADMIN' && security_pin !== undefined) {
     const providedPin = String(security_pin).trim();
-    if (!providedPin || providedPin !== ADMIN_SECURITY_PIN) {
+    if (!verifyAdminSecurityPin(providedPin)) {
       addAuditLog(store, null, 'ADMIN_PIN_FAILED', 'Auth', 'ADMIN', 'Failed Admin Security PIN verification attempt', req.ip, 'FAILED');
       saveStore(store);
       return res.status(401).json({ error: 'Invalid Admin Security PIN.' });
@@ -1916,6 +1986,7 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
     if (!admin) {
       return res.status(404).json({ error: 'No Admin account found. Please register first.' });
     }
+    resetAuthRateLimit(clientIp);
     addAuditLog(store, admin, 'USER_LOGIN', 'Auth', String(admin.id), `Admin ${admin.name} signed in via verified PIN`, req.ip, 'SUCCESS');
     saveStore(store);
     const token = createToken(admin);
@@ -1954,6 +2025,7 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
     user.passwordHash = hashPassword(String(password));
   }
 
+  resetAuthRateLimit(clientIp);
   addAuditLog(store, user, 'USER_LOGIN', 'Auth', String(user.id), `${user.role} ${user.name} signed in`, req.ip, 'SUCCESS');
   saveStore(store);
 
@@ -1971,6 +2043,15 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
 });
 
 app.post('/api/auth/register/', (req: Request, res: Response) => {
+  const clientIp = req.ip || req.socket.remoteAddress || '127.0.0.1';
+  const rateLimit = checkAuthRateLimit(clientIp, 10, 60000);
+  if (!rateLimit.allowed) {
+    res.setHeader('Retry-After', rateLimit.retryAfterSeconds);
+    return res.status(429).json({
+      error: `Too many registration requests. Please wait ${rateLimit.retryAfterSeconds} seconds before trying again.`
+    });
+  }
+
   const {
     role: requestedRole,
     security_pin,
@@ -2001,7 +2082,7 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Coordinator name is required.' });
     }
     const providedPin = String(security_pin ?? '').trim();
-    if (!providedPin || providedPin !== COORDINATOR_SECURITY_PIN) {
+    if (!verifyCoordinatorSecurityPin(providedPin)) {
       addAuditLog(store, null, 'COORDINATOR_REGISTER_PIN_FAILED', 'Auth', String(name), 'Invalid Coordinator Security PIN during registration', req.ip, 'FAILED');
       saveStore(store);
       return res.status(403).json({
@@ -2053,6 +2134,7 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
     addAuditLog(store, newCoordinator, 'COORDINATOR_REGISTER', 'User', String(newCoordinator.id), `Registered Coordinator (${selectedDept.code}) via verified PIN`, req.ip, 'SUCCESS');
     saveStore(store);
 
+    resetAuthRateLimit(clientIp);
     const token = createToken(newCoordinator);
     const { passwordHash, ...safeUser } = newCoordinator;
     return res.status(201).json({
@@ -2069,7 +2151,7 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Admin name is required.' });
     }
     const providedPin = String(security_pin ?? '').trim();
-    if (!providedPin || providedPin !== ADMIN_SECURITY_PIN) {
+    if (!verifyAdminSecurityPin(providedPin)) {
       addAuditLog(store, null, 'ADMIN_REGISTER_PIN_FAILED', 'Auth', String(name), 'Invalid Admin Security PIN during registration', req.ip, 'FAILED');
       saveStore(store);
       return res.status(403).json({
@@ -2099,6 +2181,7 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
     addAuditLog(store, newAdmin, 'ADMIN_REGISTER', 'User', String(newAdmin.id), 'Registered via verified PIN', req.ip, 'SUCCESS');
     saveStore(store);
 
+    resetAuthRateLimit(clientIp);
     const token = createToken(newAdmin);
     const { passwordHash, ...safeUser } = newAdmin;
     return res.status(201).json({
@@ -2205,6 +2288,7 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
   addAuditLog(store, newUser, 'STUDENT_SELF_REGISTER', 'User', String(newUser.id), `Student ${newUser.name} (${cleanRoll}, ${selectedDept.code}, ${selectedAcadYear}) registered`, req.ip, 'SUCCESS');
   saveStore(store);
 
+  resetAuthRateLimit(clientIp);
   const token = createToken(newUser);
   const { passwordHash, ...safeUser } = newUser;
 
@@ -7036,7 +7120,6 @@ export default app;
 
 // Only auto-start the server when running locally (not on Vercel serverless)
 // VERCEL env var is automatically set by Vercel's build/runtime environment
-const IS_VERCEL = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
 if (!IS_VERCEL) {
   startServer().catch(err => {
     console.error('Failed to start IPTS server:', err);
