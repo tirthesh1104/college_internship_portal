@@ -7,7 +7,7 @@
     "dev": "tsx server.ts",
     "start": "node server.ts",
     "build": "vite build",
-    "vercel-build": "vite build",
+    "vercel-build": "esbuild server.ts --platform=node --format=esm --outfile=server.js && vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"

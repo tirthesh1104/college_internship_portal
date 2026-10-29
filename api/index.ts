@@ -16,6 +16,6 @@
  * or another external database.
  */
 
-import app from '../server';
+import app from '../server.js';
 
 export default app;

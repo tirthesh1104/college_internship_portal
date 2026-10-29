@@ -11,4 +11,5 @@ coverage/
 .vercel
 api/*.js
 api/*.js.map
+server.js
 *.zip
