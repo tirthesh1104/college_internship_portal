@@ -1,0 +1,19 @@
+ipts/backend/seed_data.py:83 [dummy]: # NOTE: Dummy student data removed. Students must register through the registration form.
+ipts/backend/update_coordinator_name.py:15 [tirthesh]: coord_user.name = 'Tirthesh Gutte'
+ipts/frontend/src/pages/admin/AnalyticsReports.tsx:11 [tirthesh]: '1,"Tirthesh Gutte","MIT-2023-CS-042","Computer Science & Engineering","RITES Limited","Full-Stack Intern","ACTIVE",3,"Y
+ipts/frontend/src/pages/admin/AnalyticsReports.tsx:12 [aditi]: '2,"Aditi Sharma","MIT-2023-ETC-018","Electronics & Telecommunication","Central Railway","IoT Intern","ACTIVE",2,"YES"',
+ipts/frontend/src/pages/admin/AnalyticsReports.tsx:12 [sharma]: '2,"Aditi Sharma","MIT-2023-ETC-018","Electronics & Telecommunication","Central Railway","IoT Intern","ACTIVE",2,"YES"',
+ipts/frontend/src/pages/admin/AnalyticsReports.tsx:13 [rahul]: '3,"Rahul Deshmukh","MIT-2022-MECH-005","Mechanical Engineering","BEML Limited","Design Trainee","COMPLETED",8,"YES"'
+ipts/frontend/src/pages/admin/AnalyticsReports.tsx:13 [deshmukh]: '3,"Rahul Deshmukh","MIT-2022-MECH-005","Mechanical Engineering","BEML Limited","Design Trainee","COMPLETED",8,"YES"'
+ipts/frontend/src/pages/admin/AuditLogs.tsx:44 [tirthesh]: actor_name: 'Tirthesh Gutte',
+ipts/frontend/src/pages/admin/InternshipTracking.tsx:24 [tirthesh]: student_name: 'Tirthesh Gutte',
+ipts/frontend/src/pages/admin/InternshipTracking.tsx:37 [aditi]: student_name: 'Aditi Sharma',
+ipts/frontend/src/pages/admin/InternshipTracking.tsx:37 [sharma]: student_name: 'Aditi Sharma',
+ipts/frontend/src/pages/admin/InternshipTracking.tsx:50 [rahul]: student_name: 'Rahul Deshmukh',
+ipts/frontend/src/pages/admin/InternshipTracking.tsx:50 [deshmukh]: student_name: 'Rahul Deshmukh',
+ipts/frontend/src/pages/admin/StudentManagement.tsx:267 [rahul]: placeholder="e.g. Rahul Deshmukh"
+ipts/frontend/src/pages/admin/StudentManagement.tsx:267 [deshmukh]: placeholder="e.g. Rahul Deshmukh"
+ipts/frontend/src/pages/admin/StudentManagement.tsx:279 [rahul]: placeholder="rahul.deshmukh@mitcorer.edu.in"
+ipts/frontend/src/pages/admin/StudentManagement.tsx:279 [deshmukh]: placeholder="rahul.deshmukh@mitcorer.edu.in"
+ipts/frontend/src/pages/public/HelpSupport.tsx:78 [tirthesh]: placeholder="e.g. Tirthesh Gutte"
+ipts/frontend/src/pages/public/QRVerification.tsx:8 [tirthesh]: const [inputKey, setInputKey] = useState(qrKey || 'mitcorer-cert-tirthesh-tm2026-ver');

@@ -1,0 +1,13 @@
+python : Creating test database for alias 'default'...
+At line:1 char:1
++ python C:\Users\Lenovo\Desktop\ipts\backend\manage.py test tests.test ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Creating test d...as 'default'...:String) [], RemoteE 
+   xception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Got an error creating the test database: (1007, "Can't create database 
+'test_mitcorer_internship_hub'; database exists")
+
+Found 46 test(s).

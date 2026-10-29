@@ -1,0 +1,1208 @@
+# IPTS / MITCORER INTERNSHIP HUB
+## COMPLETE MASTER PROMPT — FULL WEBSITE AUDIT, DEVELOPMENT, INTEGRATION, BUG FIXING AND PRODUCTION READINESS
+
+### 1. YOUR ROLE AND PRIMARY OBJECTIVE
+
+Act as a senior full-stack software engineer, software architect, database engineer, UI/UX engineer, QA engineer, security engineer, and deployment specialist.
+
+I am building the **Internship Performance Tracking System (IPTS) / MITCORER Internship Hub** for MAEER’s MIT College of Railway Engineering and Research (MITCORER), Barshi.
+
+Your task is to inspect the entire existing project, understand all existing code and requirements, and complete the application into one integrated, secure, fully functional, production-ready web application.
+
+This is not a request to create only a landing page, dashboard mockup, UI prototype, or new application that ignores my existing work.
+
+The final product must connect the frontend, backend, database, authentication, authorization, file storage, notifications, dashboards, reports, and all modules into a consistent system.
+
+**Main objective:** Complete every required feature from the first stage to the final stage, fix existing errors, preserve working functionality, and verify every critical workflow using real API and database operations.
+
+### 2. MANDATORY RULES BEFORE CHANGING CODE
+
+Before making any changes:
+
+1. Inspect the entire provided repository, project files, package configuration, source code, routes, components, forms, API services, backend, models, database configuration, migrations, authentication, environment variables, and documentation.
+2. Determine which modules are complete, partially implemented, broken, disconnected, duplicated, or missing.
+3. Identify the actual frontend framework, backend framework, database, current hosting configuration, and existing integrations.
+4. Read the existing project requirements and retain every previously implemented feature that is still required.
+5. Prepare a short implementation plan based on the actual source code.
+6. Start fixing and implementing the project immediately after the audit. Do not stop after producing a plan or asking me to manually repeat known requirements.
+7. Make changes directly in the supplied project workspace when your environment supports file editing.
+8. Work incrementally, validating the application after each major change.
+
+#### Preserve existing UI and forms
+
+**Do not redesign or replace existing forms. Do not change their existing fields, labels, names, validation rules, layout, buttons, workflow, or behavior unless a specific defect requires a minimal correction.**
+
+Preserve the existing page design, branding, logo placement, sidebar, routes, navigation, responsive layout, and working components.
+
+Do not remove an existing module simply because it is difficult to repair.
+
+Do not replace existing functionality with a simplified implementation, mock screen, placeholder page, or newly invented workflow.
+
+If a component is already working, preserve it and integrate it correctly with the backend.
+
+If a required change affects an existing form or workflow, make the smallest necessary change and explain why it is required.
+
+### 3. TECHNOLOGY STACK AND ARCHITECTURE
+
+Inspect the supplied project before choosing technologies.
+
+The existing IPTS project has used:
+
+- Frontend: React, TypeScript, Vite, and existing CSS/component libraries.
+- Backend: Python, Django, and Django REST Framework.
+- Database: MySQL 8 in the current project context.
+- Existing icons, charts, authentication utilities, layouts, and frontend services where available.
+
+Retain the actual stack already implemented in the repository. Do not rebuild the project using another framework merely because it is easier.
+
+If the existing repository contains a different established database or backend configuration, inspect it and document the discrepancy before changing anything. Never switch databases or discard existing data just to follow a generic recommendation.
+
+Use a clean, maintainable architecture with clear separation between:
+
+- Frontend components and pages.
+- API client and authentication services.
+- Backend models, serializers, views, services, permissions, and URL routes.
+- Database migrations.
+- File storage.
+- Notifications and background jobs where required.
+- Automated tests and deployment configuration.
+
+If Google AI Studio cannot directly execute or host part of the existing stack, generate the required source files and configuration for that stack and clearly identify the external service or environment needed to run it. Do not falsely claim that a backend or database is live without verifying the connection.
+
+### 4. USER ROLES AND ACCOUNT MANAGEMENT
+
+Implement exactly the required role-based system.
+
+#### A. Admin
+
+The Admin has authorized system-wide access to:
+
+- Manage registered users.
+- Create, edit, activate, deactivate, and manage accounts.
+- Manage Student and Coordinator roles.
+- Assign Coordinators to students, departments, and academic years.
+- Manage internship and training opportunities.
+- Approve and publish opportunities.
+- View applications and internship records.
+- Monitor weekly reports, assessments, and pending reviews.
+- Verify official documents and certificates.
+- Approve internship completion according to policy.
+- Manage notifications, announcements, and community moderation.
+- Access analytics and authorized exports.
+- Review system activity and audit logs.
+- Manage system configuration and authorized permissions.
+
+#### B. Coordinator
+
+A Coordinator can access the functions explicitly permitted by their assigned role and scope:
+
+- View assigned students and their profiles.
+- Review authorized applications.
+- Review weekly progress reports.
+- Approve reports or request improvements.
+- Give feedback and assign improvement tasks.
+- Assess technical skills.
+- Verify authorized documents.
+- Monitor overdue reports and inactive students.
+- Review internship completion requests.
+- Add internship opportunities and submit them for approval.
+- View assigned-student analytics and authorized reports.
+- Participate in announcements and community workflows as permitted.
+
+A Coordinator must not automatically receive unrestricted Admin permissions.
+
+#### C. Student
+
+Students can:
+
+- Register and log in.
+- Manage their own profile.
+- Browse published opportunities.
+- Submit and track applications.
+- Record selected and active internships.
+- Upload offer letters and joining proof.
+- Submit weekly progress reports.
+- View Coordinator feedback and assigned tasks.
+- Track skills and assessments.
+- Upload certificates and project evidence.
+- Build their career portfolio.
+- Use authorized community and career features.
+- View their own notifications and internship progress.
+- Request completion verification.
+
+Students must never be able to promote themselves to Admin or Coordinator.
+
+#### Existing privileged accounts
+
+Preserve legitimate existing Admin and Coordinator accounts, role assignments, permissions, and records.
+
+Previously specified account identities:
+
+- Admin: `admin@mitcorer.edu.in` — Prof. Meghraj Chougoule.
+- Coordinator: `coordinator.cse@mitcorer.edu.in` — Tirthesh Gutte.
+
+Treat these as existing account identities to verify against the actual database, not instructions to create duplicate users or reset credentials.
+
+Do not delete, recreate, demote, or modify privileged accounts without first verifying the current records and the reason for the change.
+
+### 5. AUTHENTICATION AND REGISTRATION
+
+Complete the entire authentication workflow.
+
+Required functionality:
+
+- Student self-registration.
+- Admin-created accounts.
+- Secure login and logout.
+- Password hashing using the backend framework's supported secure mechanism.
+- Forgot-password and password-reset workflow.
+- Email verification where configured.
+- Session or token handling appropriate to the existing architecture.
+- Protected routes.
+- Account activation and deactivation.
+- Correct role-based redirects.
+- Duplicate-account prevention.
+- Clear validation and error messages.
+- Secure handling of authentication failures.
+
+Accept syntactically valid email addresses from legitimate domains, including Gmail, Outlook, Yahoo, and institutional domains.
+
+Do not hardcode an institutional email-domain restriction unless an explicitly approved college policy requires it.
+
+Validate email syntax and uniqueness. Never assign a role simply because an email address uses a particular domain.
+
+Remove the old shared-PIN or hardcoded-password approach if present. Do not use a common PIN such as `77` as an authentication mechanism.
+
+Never expose passwords, private tokens, API keys, or database credentials in frontend code or public source files.
+
+### 6. GLOBAL BLACK / WHITE THEME TOGGLE
+
+Add a working **Light / Dark theme toggle at the top-right of the main website header**.
+
+This is a mandatory UI requirement.
+
+The control must:
+
+- Be visible and easy to find.
+- Switch between a light theme and a dark theme.
+- Work across the complete application, not just one dashboard.
+- Apply to public pages, login, registration, Student, Coordinator, Admin, forms, tables, dialogs, charts, and other modules.
+- Preserve readability, accessible contrast, and clear focus indicators.
+- Style backgrounds, cards, text, inputs, borders, dropdowns, modals, and navigation consistently.
+- Persist the user's selected theme across page reloads and navigation.
+- Work correctly on desktop, tablet, and mobile.
+- Include an accessible label or tooltip and a suitable icon.
+- Avoid a flash of the wrong theme during initialization where practical.
+
+Use the existing theme system if one exists. Otherwise, implement a centralized theme provider or equivalent global mechanism.
+
+Do not duplicate separate theme logic across every page. Do not modify the existing forms to introduce the theme.
+
+Verify that the toggle actually changes the entire site and that the selection persists after refreshing the browser.
+
+### 7. WEBSITE NAVIGATION AND PAGES
+
+Retain all existing working routes and navigation. Integrate the following required modules into the existing application.
+
+#### Public pages
+
+- Home.
+- About the Internship Hub.
+- Publicly available opportunities.
+- Training programs.
+- Login.
+- Student registration.
+- Forgot password.
+- Help and support.
+
+#### Student portal
+
+- Overview dashboard.
+- Internship opportunities.
+- Training programs.
+- My applications.
+- My internships.
+- Weekly progress reports.
+- Performance tracker.
+- Tasks and deadlines.
+- Skills and assessments.
+- Projects and portfolio.
+- Certificates and documents.
+- AI Career Assistant.
+- Digital Career Passport.
+- Mentor Connect.
+- Project Team Finder.
+- Student Community.
+- Announcements.
+- Notifications.
+- My profile.
+- Settings and privacy.
+- Help and support.
+
+#### Coordinator portal
+
+- Overview.
+- Assigned students.
+- Application reviews.
+- Progress report reviews.
+- Feedback and improvement tasks.
+- Skill assessments.
+- Document verification.
+- Internship completion approvals.
+- Inactive and overdue student monitoring.
+- Opportunities and approval status.
+- Announcements and notifications.
+- Reports and analytics.
+- Profile and settings.
+
+#### Admin portal
+
+- System overview.
+- Student management.
+- Coordinator management.
+- Roles and permissions.
+- Internship and training management.
+- Opportunity approval and publication.
+- Application analytics.
+- Internship tracking.
+- Weekly report monitoring.
+- Performance and skill analytics.
+- Document and certificate verification.
+- Mentor management.
+- Community and announcements management.
+- International opportunities.
+- Leaderboard and achievements.
+- Reports and exports.
+- Notifications.
+- System settings.
+- Audit logs.
+
+Connect each page to the correct role and real data. Do not create duplicate pages that perform the same function unnecessarily.
+
+### 8. STUDENT DASHBOARD
+
+Display actual database-driven metrics, including:
+
+- Total applications.
+- Applications under review.
+- Shortlisted and selected applications.
+- Active internships.
+- Completed internships.
+- Pending weekly reports.
+- Approved weekly reports.
+- Pending tasks.
+- Completed tasks.
+- Verified certificates.
+- Skill progress.
+
+Also show:
+
+- Recently published opportunities.
+- Upcoming deadlines.
+- Pending submissions.
+- Latest Coordinator feedback.
+- Recent notifications.
+- Current improvement tasks.
+- Project activity.
+- Internship progress.
+
+All metrics must be calculated from real authorized records.
+
+Never display hardcoded totals, fabricated progress percentages, fake charts, or invented student activity.
+
+If no records exist, show a helpful empty state instead of fabricated data.
+
+### 9. INTERNSHIP OPPORTUNITY MANAGEMENT
+
+Admin and authorized Coordinators must be able to manage opportunities through the existing forms.
+
+Opportunity information should support:
+
+- Title.
+- Organization or company name.
+- Opportunity type.
+- Description.
+- Eligibility.
+- Learning outcomes.
+- Required skills.
+- Start and end dates.
+- Duration.
+- Paid, unpaid, or stipend details.
+- Remote, onsite, or hybrid mode.
+- Available seats, if applicable.
+- Application deadline.
+- Application method.
+- External application URL or internal application form.
+- Responsible Coordinator.
+- Organization verification status.
+- Supporting documents.
+- Publication status.
+- Creator and creation timestamps.
+
+#### Approval workflow
+
+- Admin can create opportunities and publish them according to permissions.
+- Coordinator can create an opportunity and submit it for Admin approval.
+- Admin can approve, reject, publish, unpublish, or return an opportunity for correction.
+- Record the decision, reviewer, timestamps, and reason where applicable.
+- Only approved and published opportunities appear in the shared Student Opportunities list.
+- Approved opportunities must be visible to all eligible students, not just the students assigned to the Coordinator who created them.
+- Do not bypass approval requirements through frontend manipulation or direct API requests.
+
+Use consistent states such as Draft, Pending Approval, Approved, Published, Rejected, Unpublished, and Expired.
+
+Validate URLs, deadlines, required fields, and eligibility rules.
+
+Maintain an audit history of important changes.
+
+### 10. APPLICATION MANAGEMENT
+
+Students must be able to apply to eligible opportunities and track their application status.
+
+Required states:
+
+- Submitted.
+- Under Review.
+- Shortlisted.
+- Selected.
+- Rejected.
+- Withdrawn.
+
+Implement:
+
+- Application creation and validation.
+- Duplicate-application prevention.
+- Application history.
+- Authorized status updates.
+- Reviewer comments where appropriate.
+- Status-change notifications.
+- Application filters and search.
+- Authorized application exports.
+- Correct relationships between students, opportunities, applications, and internships.
+
+Do not create an active internship automatically just because an application was submitted. Use the correct selection, offer, and joining workflow.
+
+External application links must open safely and must be distinguishable from applications submitted directly through IPTS.
+
+### 11. COMPLETE INTERNSHIP LIFECYCLE
+
+Connect the entire journey:
+
+1. Discover an opportunity.
+2. Apply.
+3. Review the application.
+4. Receive a selection decision.
+5. Upload the offer letter.
+6. Confirm joining.
+7. Activate the internship.
+8. Submit weekly progress reports.
+9. Receive feedback.
+10. Complete improvement tasks.
+11. Participate in skill assessments.
+12. Submit completion documents.
+13. Obtain document verification.
+14. Request internship completion approval.
+15. Receive the authorized completion decision.
+16. Update the portfolio and Career Passport.
+
+Each internship must have a valid status, dates, student relationship, responsible reviewer, and associated documents.
+
+Prevent invalid transitions and unauthorized completion approvals.
+
+Preserve historical records when an internship is completed or an account becomes inactive.
+
+### 12. WEEKLY PROGRESS REPORTS
+
+This is a core IPTS feature and must work end to end.
+
+Students with an eligible active internship must be able to create and submit reports containing:
+
+- Reporting week or period.
+- Tasks completed.
+- Technical skills used.
+- New learning outcomes.
+- Challenges faced.
+- Solutions implemented.
+- Project progress.
+- Evidence links or file uploads.
+- GitHub repository link, if applicable.
+- Screenshots or demonstration links.
+- Next week's plan.
+- Student reflection.
+
+#### Student workflow
+
+- Create a draft.
+- Save and edit the draft.
+- Submit the report.
+- Receive confirmation.
+- View review status.
+- Read Coordinator comments.
+- Complete improvement tasks.
+- Update and resubmit when permitted.
+- View the report's review history.
+
+#### Coordinator workflow
+
+- View pending reports for authorized assigned students.
+- Inspect report content and evidence.
+- Approve a report or request improvement.
+- Add comments, scores, and recommendations where supported.
+- Assign improvement tasks and deadlines.
+- Record the reviewer and review timestamp.
+- Trigger relevant notifications.
+
+#### Rules
+
+Use statuses such as Draft, Submitted, Under Review, Needs Improvement, and Approved.
+
+Prevent duplicate reports for the same internship and reporting period unless an explicitly supported versioning or resubmission workflow permits it.
+
+Only eligible active internships may submit reports, subject to the existing business rules.
+
+Students can access only their own reports. Coordinators can access reports within their authorized scope. Admin access must follow the assigned permissions.
+
+Implement report version history, timestamps, evidence validation, and overdue reporting rules.
+
+### 13. PERFORMANCE TRACKER AND INACTIVE STUDENTS
+
+Track performance using real evidence, including:
+
+- Weekly report consistency.
+- Task completion.
+- Project milestones.
+- Technical skill development.
+- Learning outcomes.
+- Assessment results.
+- Coordinator feedback.
+- Internship completion status.
+
+Calculate progress using documented rules. Do not invent percentages or claim that a student improved without supporting records.
+
+Implement inactive-student monitoring using the established rule: flag a student when no required weekly progress report has been submitted for 14 days, where the student has an active internship and is subject to weekly reporting.
+
+Handle holidays, approved pauses, completed internships, and other applicable exceptions according to configured policy.
+
+Display last-report date, overdue duration, and follow-up status.
+
+Do not automatically deactivate a student's account merely because they have not submitted a report.
+
+### 14. TASKS, FEEDBACK, AND DEADLINES
+
+Coordinators must be able to assign improvement tasks to authorized students.
+
+Each task should support:
+
+- Title and description.
+- Related report or internship.
+- Assigned student.
+- Assigned by.
+- Priority, if supported.
+- Due date.
+- Status.
+- Completion notes or evidence.
+- Creation and update timestamps.
+
+Students can view tasks, update permitted fields, and submit completion evidence.
+
+Coordinators can review completion and provide feedback.
+
+Support pending, in-progress, completed, and overdue states as appropriate.
+
+Generate notifications for task assignments, approaching deadlines, overdue tasks, and review outcomes.
+
+### 15. SKILLS AND TECHNICAL ASSESSMENTS
+
+Support skill records and assessments for relevant areas such as:
+
+- Python.
+- Java.
+- C++.
+- SQL.
+- Web development.
+- Data structures and algorithms.
+- Machine learning.
+- Cloud computing.
+- Other configurable technical skills.
+
+Features:
+
+- Skill name and category.
+- Initial and current level.
+- Assessment date.
+- Assessment type.
+- Practical task or quiz result.
+- Project evidence.
+- Reviewer feedback.
+- Improvement target.
+- Recommended learning activities.
+- Assessment history.
+
+Admin should be able to configure available assessments and topics where appropriate.
+
+Use real assessment results. Do not award verified skills or certificates solely because a student selects a skill on their profile.
+
+### 16. DOCUMENTS, CERTIFICATES, AND VERIFICATION
+
+Support:
+
+- Offer letters.
+- Joining proofs.
+- Weekly progress evidence.
+- Internship completion certificates.
+- Letters of Recommendation.
+- Training certificates.
+- Project reports.
+- Other authorized supporting documents.
+
+Support document statuses such as Not Uploaded, Submitted, Under Verification, Verified, Rejected, and Resubmission Required.
+
+Requirements:
+
+- Preserve the existing upload forms.
+- Validate files on the backend.
+- Maximum upload size: 5 MB.
+- Allow only PDF, JPG, and PNG for the relevant upload module unless an explicitly approved module has a different requirement.
+- Check file extensions, actual file type, file size, and appropriate content validation.
+- Store files in private storage.
+- Never expose sensitive documents through public permanent URLs.
+- Authorize every download on the server.
+- Record uploader, owner, document type, timestamp, status, and reviewer.
+- Require a reason for rejection or resubmission.
+- Keep a verification history.
+- Notify students of decisions.
+
+Support QR-based verification for college-issued or college-approved certificates where the issuing process is implemented. The public verification page must disclose only authorized information and must not expose private student records.
+
+### 17. PROFILE, PORTFOLIO, AND RESUME GENERATION
+
+Students must be able to manage their own authorized profile and career records.
+
+Support:
+
+- Academic profile.
+- Department and academic year.
+- Technical skills.
+- Verified assessments.
+- Internship history.
+- Training programs.
+- Projects.
+- GitHub and LinkedIn links.
+- Verified certificates.
+- Achievements.
+- Approved feedback summaries where appropriate.
+
+Implement resume generation using actual profile data.
+
+Requirements:
+
+- Generate a properly formatted downloadable PDF.
+- Allow the student to preview available data.
+- Never invent qualifications, certificates, internship experience, or skills.
+- Let students correct permitted profile information.
+- Respect privacy and authorization.
+- Keep private documents private.
+- Make public portfolio sharing optional, not automatic.
+
+### 18. COMMUNITY, CHAT, AND ANNOUNCEMENTS
+
+Implement a working community module connected to the backend.
+
+Requirements:
+
+- Registered users only, subject to role permissions.
+- Real sender identity from the authenticated account.
+- Persisted messages and announcements.
+- Correct timestamps.
+- Message history.
+- Loading, empty, and error states.
+- Appropriate access control.
+- Admin and Coordinator moderation permissions.
+- Report or remove inappropriate content according to policy.
+- Safe handling of user-submitted text.
+- Privacy controls.
+
+If the existing interface contains `#community` and `#announcements`, preserve the channels and connect them to real persisted data.
+
+Do not display invented conversations or fake users.
+
+Do not hardcode sender names such as Tirthesh Gutte, Aditi Sharma, or Rahul Deshmukh into community messages or student lists as sample data.
+
+Use the authenticated user's real profile information.
+
+Use WebSockets or another suitable real-time mechanism only if it can be properly configured and tested. Otherwise, implement reliable refresh or polling and describe the actual update behavior accurately.
+
+### 19. NOTIFICATIONS AND REMINDERS
+
+Create a centralized notification system.
+
+Notify relevant users about:
+
+- New published opportunities.
+- Application status changes.
+- Report submission.
+- Report review.
+- Feedback and resubmission requests.
+- Improvement tasks.
+- Upcoming deadlines.
+- Overdue reports.
+- Document verification.
+- Internship completion decisions.
+- Announcements.
+- Relevant mentoring and meeting updates.
+
+Implement read/unread states, timestamps, recipient authorization, and sensible notification deduplication.
+
+Notifications must be persisted and associated with the correct recipient.
+
+Email notifications may be enabled through a configured email provider. Do not claim emails are sent if provider credentials or delivery integration are not configured.
+
+### 20. INTERNATIONAL OPPORTUNITIES, LEADERBOARD, STREAKS, AND BADGES
+
+Implement these existing planned Phase 7 features.
+
+#### International opportunities
+
+Authorized staff can create and manage international opportunities with details such as:
+
+- Program or opportunity title.
+- Country.
+- Organization.
+- Description.
+- Eligibility.
+- Funding information.
+- Deadline.
+- Application URL.
+- Publication status.
+
+Students should see published opportunities according to eligibility.
+
+#### Points
+
+Use the established point rules:
+
+- Approved weekly report: +10 points.
+- Certificate or offer-letter upload: +5 points per eligible upload, limited to three point-awarding uploads per month.
+- Completed internship: +50 points.
+
+Ensure the system cannot award points repeatedly for the same qualifying event. Upload points must follow the monthly limit.
+
+#### Badges
+
+Support:
+
+- First Report: first approved report.
+- 4-Week Streak: four consecutive qualifying reporting weeks.
+- 8-Week Streak: eight consecutive qualifying reporting weeks.
+- First Internship Completed.
+- Top Performer of the Month.
+
+Define how each badge is earned and calculate it from verified database events. Do not fabricate streaks or badges.
+
+Leaderboards should use transparent rules and appropriate privacy controls. Avoid publicly exposing sensitive personal information.
+
+### 21. OPTIONAL ADVANCED CAREER FEATURES
+
+Retain and integrate these planned modules where they exist in the project or are part of the agreed scope:
+
+#### AI Career Assistant
+
+Can help with internship recommendations, career paths, resume wording, interview preparation, skill gaps, learning resources, and progress-feedback summaries.
+
+Use an authorized AI provider and secure server-side API configuration.
+
+Do not expose API keys in the frontend. Protect personal data, apply usage limits, and keep AI recommendations advisory. AI must not independently reject students or guarantee placement.
+
+If no AI provider is configured, display a truthful configuration state rather than pretending the assistant is working.
+
+#### Mentor Connect
+
+Support mentor profiles, expertise, mentoring requests, meeting bookings, learning goals, authorized meeting notes, and follow-up tasks.
+
+Restrict private mentoring information to authorized participants.
+
+#### Project Team Finder
+
+Support project descriptions, technical interests, team creation, member requests, and authorized team management.
+
+#### Learning resources and events
+
+Support authorized staff-created resources, workshops, events, and announcements where these modules are included in the current project.
+
+Do not leave buttons that imply functionality exists when the corresponding workflow is not implemented.
+
+### 22. ADMIN AND COORDINATOR ANALYTICS
+
+Build all analytics from actual database records.
+
+Support relevant metrics such as:
+
+- Students by department and academic year.
+- Application counts and status distribution.
+- Selection rates.
+- Active and completed internships.
+- Pending weekly reports.
+- Overdue reports.
+- Report-review turnaround time.
+- Pending document verification.
+- Skill development.
+- Task completion.
+- Coordinator workload.
+- Opportunity publication and application activity.
+- Completion trends.
+
+Provide filters where applicable:
+
+- Date range.
+- Department.
+- Academic year.
+- Student.
+- Coordinator.
+- Opportunity type.
+- Application status.
+- Internship status.
+- Document status.
+
+Exports should include the records and metrics matching the active filters and the user's permissions.
+
+Implement authorized PDF, CSV, and Excel exports where required.
+
+Never hardcode chart data, summary numbers, or performance trends.
+
+Document how each metric is calculated and how empty or missing data is handled.
+
+### 23. DATABASE DESIGN AND DATA INTEGRITY
+
+Inspect the actual database schema and migrations before changing the data model.
+
+Ensure the system has appropriate normalized relationships for:
+
+- Users and roles.
+- Student profiles.
+- Coordinator assignments.
+- Departments and academic years.
+- Opportunities.
+- Applications.
+- Internships.
+- Weekly reports.
+- Report evidence and versions.
+- Feedback.
+- Tasks and deadlines.
+- Skills and assessments.
+- Documents and verification history.
+- Projects and portfolio records.
+- Notifications.
+- Community messages.
+- Announcements.
+- Mentor records.
+- International opportunities.
+- Achievements and points.
+- Audit logs.
+
+Use primary keys, foreign keys, indexes, uniqueness constraints, validation, timestamps, and transactions as appropriate.
+
+Avoid duplicate data and inconsistent relationships.
+
+Use database migrations to evolve the schema safely.
+
+Do not reset or truncate the database to fix an application issue.
+
+Do not drop tables or delete existing records merely to make tests pass.
+
+Before any data migration or cleanup, inspect the affected records, explain the proposed change, create or verify a recoverable backup where possible, and preserve legitimate data.
+
+### 24. STRICT NO-FAKE-DATA POLICY
+
+This is mandatory.
+
+The production application must use actual persisted records.
+
+Do not create fake:
+
+- Student accounts.
+- Coordinator accounts.
+- Admin accounts.
+- Internship opportunities.
+- Applications.
+- Weekly reports.
+- Community messages.
+- Documents.
+- Certificates.
+- Dashboard statistics.
+- Skill scores.
+- Notifications.
+- Analytics.
+- Leaderboard entries.
+
+Remove hardcoded mock arrays, fabricated dashboard totals, demo conversations, and fallback data that masquerade as real production records.
+
+Previously identified possible dummy/test examples include Aditi Sharma and Rahul Deshmukh, along with other sample records. The name Tirthesh Gutte must not be inserted as a dummy student either.
+
+**Do not delete a real person or account based only on a matching name.** Verify whether a record is genuinely test data before removing it.
+
+Preserve all legitimate existing users and data, including authorized Admin and Coordinator records.
+
+Only genuine registration, authorized account creation, or a verified data-import process may create actual user records.
+
+For development, use isolated test fixtures or a separate test database. Never run test seeding against production.
+
+When no data exists, show clear empty states such as “No applications found” or “No reports submitted yet.”
+
+### 25. SECURITY AND PRIVACY
+
+Implement security at both frontend and backend levels.
+
+Requirements:
+
+- Authentication on protected APIs.
+- Server-side role-based authorization.
+- Object-level authorization.
+- Secure password hashing.
+- Safe session or token handling.
+- Input validation and output encoding.
+- Protection against SQL injection and cross-site scripting.
+- CSRF protection where applicable.
+- Rate limiting for sensitive endpoints.
+- Secure password-reset flow.
+- Safe file uploads and private storage.
+- HTTPS in production.
+- Environment-based secrets.
+- Audit logs for sensitive changes.
+- Appropriate session expiration and logout behavior.
+- Secure error responses that do not expose secrets or internal traces.
+- Database backup and restore procedures.
+- Privacy controls for profiles and community features.
+
+A Student must not be able to read or modify another Student's reports, documents, applications, tasks, or profile by changing a URL, request parameter, or record ID.
+
+A Coordinator must not access students outside their assigned scope unless explicitly authorized.
+
+A frontend button being hidden is not sufficient authorization. Enforce every permission on the backend.
+
+Never commit real passwords, API keys, database passwords, or production tokens to source control.
+
+### 26. EXISTING PROJECT BUGS AND CODE QUALITY
+
+Audit the existing project for:
+
+- TypeScript compilation errors.
+- JSX parser errors.
+- Missing imports.
+- Invalid component syntax.
+- Incorrect types and interfaces.
+- Incorrect icon imports.
+- Missing optional-value handling.
+- Broken API requests.
+- Incorrect routes.
+- Authentication and authorization defects.
+- Form validation issues.
+- Broken state updates.
+- Incorrect database relationships.
+- Failed migrations.
+- Runtime exceptions.
+- Incomplete event handlers.
+- Dead buttons and placeholder actions.
+- Duplicate API calls.
+- Stale dashboard data.
+- Incorrect calculations.
+- Broken mobile layouts.
+- Dependency conflicts.
+- Production-build failures.
+
+The existing project previously had build and lint issues in files including `PerformanceTracker.tsx`, `WeeklyReports.tsx`, `Documents.tsx`, `Resume.tsx`, `StaffStudentDetail.tsx`, and `types/index.ts`.
+
+Reinspect the current source rather than assuming any historical fix is still needed. Resolve the errors that actually exist.
+
+Run the available frontend build, backend checks, tests, and lint commands.
+
+Do not hide real errors by disabling type checking, suppressing meaningful exceptions, removing required functionality, or weakening validation.
+
+Do not replace entire components when a targeted correction is sufficient.
+
+### 27. API AND FRONTEND INTEGRATION
+
+Every required UI action must call the appropriate backend service and produce the correct persisted result.
+
+Verify that:
+
+- Login uses the actual authentication service.
+- Profile updates save to the database.
+- Opportunities are fetched from the API.
+- Opportunity creation and approval persist.
+- Applications are saved and statuses update correctly.
+- Reports and evidence are persisted.
+- Feedback and tasks are associated with the correct users.
+- Documents are uploaded and authorized.
+- Notifications are stored and marked read correctly.
+- Community messages persist and load correctly.
+- Analytics reflect actual database records.
+- Exports match the authorized filtered dataset.
+- Dashboard updates reflect successful mutations.
+
+Use consistent API error handling, loading states, success messages, and validation errors.
+
+Do not use browser storage as a substitute for the backend database for business-critical records.
+
+Use environment variables for API base URLs and other environment-specific configuration.
+
+Do not hardcode production URLs or secrets into application components.
+
+### 28. RESPONSIVE UI AND ACCESSIBILITY
+
+Preserve the existing visual identity and make the complete site usable on:
+
+- Desktop.
+- Laptop.
+- Tablet.
+- Mobile.
+
+Ensure:
+
+- Responsive navigation.
+- Readable typography.
+- Consistent spacing.
+- Properly styled forms.
+- Accessible labels.
+- Keyboard navigation.
+- Visible focus states.
+- Appropriate contrast in both themes.
+- Responsive tables or mobile-friendly alternatives.
+- Useful loading, empty, error, and success states.
+- Confirmation dialogs for destructive actions.
+- Clear validation messages.
+- Consistent buttons, icons, and status indicators.
+
+Do not add unnecessary animations, duplicate navigation, decorative features that obstruct workflows, or unrelated redesigns.
+
+### 29. DEPLOYMENT AND PRODUCTION CONFIGURATION
+
+Inspect the current hosting setup before proposing deployment changes.
+
+Prepare the existing application for real deployment, including:
+
+- Frontend production build.
+- Backend production configuration.
+- Database connection.
+- Environment variables.
+- Database migrations.
+- Static asset handling.
+- Private document storage.
+- CORS and CSRF configuration where applicable.
+- HTTPS.
+- Secure cookies or token configuration.
+- Production logging.
+- Error handling.
+- Health checks.
+- Database backups.
+- Restore procedures.
+- Deployment and rollback instructions.
+- Email and optional AI integrations.
+- Correct frontend and backend URLs.
+
+For Django production, verify settings such as `DEBUG=False`, appropriate `ALLOWED_HOSTS`, secret management, secure HTTPS configuration, and production database credentials.
+
+Provide `.env.example` files with placeholders only. Never insert actual secrets into examples.
+
+Choose budget-conscious hosting that is genuinely compatible with the actual frontend, backend, database, and file-storage requirements. Clearly identify any service that requires an account, billing, credentials, or manual configuration.
+
+Do not claim the website is live until the deployed frontend, backend, database, and essential workflows have been verified.
+
+### 30. TESTING REQUIREMENTS
+
+Test the actual implementation rather than merely checking whether pages render.
+
+#### Authentication tests
+
+- Student registration.
+- Duplicate email rejection.
+- Login and logout.
+- Password reset.
+- Invalid credentials.
+- Protected pages.
+- Correct role-based redirects.
+- Account deactivation.
+
+#### Authorization tests
+
+- Student cannot access another Student's private records.
+- Coordinator cannot access unauthorized students.
+- Admin-only operations reject unauthorized users.
+- Direct API requests cannot bypass frontend permissions.
+- Private document downloads require authorization.
+
+#### Opportunity and application tests
+
+- Create opportunity.
+- Submit Coordinator opportunity for approval.
+- Approve or reject it as Admin.
+- Publish approved opportunity.
+- Confirm visibility to eligible Students.
+- Apply to opportunity.
+- Prevent duplicate applications.
+- Update and view authorized application status.
+
+#### Weekly report tests
+
+- Create and save a draft.
+- Submit a report.
+- Prevent duplicate reporting periods.
+- Review and approve.
+- Request improvements.
+- Resubmit where allowed.
+- Confirm feedback and timestamps persist.
+- Confirm 14-day inactivity rules work correctly.
+
+#### Documents and tasks tests
+
+- Upload a valid file.
+- Reject an oversized file.
+- Reject a disallowed file type.
+- Verify private downloads.
+- Verify document approval and rejection.
+- Create and complete an improvement task.
+
+#### Community and notifications tests
+
+- Send and persist a message.
+- Verify the sender identity.
+- Load message history.
+- Enforce role and channel permissions.
+- Generate and read notifications.
+
+#### Theme tests
+
+- Switch Light to Dark.
+- Switch Dark to Light.
+- Navigate across multiple routes.
+- Refresh the page.
+- Confirm the selected theme persists.
+- Check forms, dialogs, charts, and mobile navigation.
+
+#### Build and regression tests
+
+- Frontend production build succeeds.
+- Backend framework checks pass.
+- Database migrations apply successfully in the intended environment.
+- Critical automated tests pass.
+- Existing forms and routes still work.
+- Existing legitimate records remain intact.
+- No required module is broken by a new change.
+
+Record actual results. Mark untested workflows as unverified; never fabricate passing test results.
+
+### 31. IMPLEMENTATION ORDER — COMPLETE FROM START TO FINISH
+
+Follow this order, adapting it to the actual project.
+
+**Phase 0 — Audit and preservation**
+
+Inspect the repository, database, dependencies, current feature status, errors, and environment. Preserve existing working code and legitimate data.
+
+**Phase 1 — Foundation**
+
+Complete authentication, account management, role-based access, profiles, database connections, migrations, and the global theme toggle.
+
+**Phase 2 — Opportunities and applications**
+
+Complete opportunity creation, approval, publication, shared student visibility, applications, status tracking, and notifications.
+
+**Phase 3 — Internship performance**
+
+Complete internship lifecycle management, weekly reports, evidence, review, feedback, tasks, inactivity monitoring, and performance tracking.
+
+**Phase 4 — Documents and career records**
+
+Complete uploads, private storage, verification, completion approval, profiles, portfolio, resume PDF generation, and career records.
+
+**Phase 5 — Community and communications**
+
+Complete persisted messages, announcements, moderation, notification history, and authorized real-time or refresh behavior.
+
+**Phase 6 — Analytics and exports**
+
+Complete dashboards, filters, reports, calculations, PDF/CSV/Excel exports, and Coordinator workload monitoring.
+
+**Phase 7 — Advanced features**
+
+Complete international opportunities, points, badges, report streaks, AI Career Assistant, Mentor Connect, Skill Verification Lab, and Project Team Finder according to the existing agreed scope and available integrations.
+
+**Phase 8 — Full integration and quality assurance**
+
+Run end-to-end tests, regression checks, security checks, database verification, build validation, and responsive UI testing.
+
+**Phase 9 — Deployment readiness**
+
+Prepare production configuration, environment examples, migrations, backup and restore instructions, deployment documentation, and a clear verification report.
+
+Do not skip a phase's essential functionality merely to make the project appear complete. New phases must not break previously working features.
+
+### 32. REQUIRED PROJECT DOCUMENTATION
+
+Create or update documentation that reflects the actual implementation:
+
+- `README.md` — project overview, setup, and run instructions.
+- `docs/requirements.md` — implemented requirements and outstanding work.
+- `docs/database-schema.md` — tables, relationships, and constraints.
+- `docs/api-documentation.md` — endpoints, methods, permissions, and response behavior.
+- `docs/deployment-guide.md` — actual deployment steps and environment configuration.
+- `docs/VERIFICATION.md` — commands executed, tests run, results, failures, and unverified items.
+- `.env.example` — placeholder environment variables only.
+
+Do not document a feature as complete if it is only a UI placeholder or has not been verified.
+
+### 33. FINAL ACCEPTANCE CRITERIA
+
+The website can be considered ready only when the following are verified:
+
+1. Existing working forms, layouts, navigation, and required fields are preserved.
+2. The Light/Dark toggle is at the top-right and works throughout the website.
+3. Authentication and all three roles work correctly.
+4. Real users and legitimate data are preserved.
+5. No fake production records or hardcoded dashboard statistics remain.
+6. Opportunities can be created, approved, published, and displayed correctly.
+7. Applications and internship records persist.
+8. Weekly reports, reviews, feedback, and tasks work end to end.
+9. Documents can be uploaded, verified, and downloaded securely.
+10. Community messages and notifications persist correctly.
+11. Career records and resume generation use actual student data.
+12. Analytics and exports reflect actual authorized records.
+13. Backend authorization prevents cross-user access.
+14. Frontend builds and backend checks pass, with any remaining issues documented.
+15. Database migrations and deployment instructions are correct.
+16. No existing working feature has been silently removed.
+17. All unverified integrations and remaining deployment dependencies are explicitly listed.
+
+### 34. HOW YOU MUST WORK
+
+Do not return only a proposed design, a checklist, a tutorial, or sample code.
+
+Inspect the project and then implement the required changes in the available workspace.
+
+Work in small, coherent changes. After each phase, run the relevant checks and fix regressions before continuing.
+
+If a required credential, external service, or deployment permission is missing, implement everything that can be completed safely and identify the exact remaining configuration required. Do not invent credentials or pretend to access an external account.
+
+If the environment has a file or execution limit, prioritize fixing the existing application and completing the critical end-to-end workflows. Clearly report any unfinished work rather than claiming everything is complete.
+
+Do not ask me to repeat requirements already provided in the project or this prompt.
+
+### 35. FINAL RESPONSE REQUIRED
+
+When implementation is finished, provide:
+
+1. Summary of what was actually changed.
+2. List of completed modules.
+3. List of bugs fixed.
+4. Frontend build and backend test results.
+5. Database and migration status.
+6. Verification of Student, Coordinator, and Admin workflows.
+7. Verification of the global Light/Dark toggle.
+8. Confirmation of whether real database integration was tested.
+9. Confirmation of whether fake/test data was removed or retained, with the verification method.
+10. Security issues discovered and fixed.
+11. Deployment status and required external configuration.
+12. Exact list of incomplete or unverified items.
+13. Files changed and important commands executed.
+14. Instructions to run and verify the complete application.
+
+**FINAL INSTRUCTION:** Treat this as one integrated, existing-product completion task. Use the full requirements above together with the actual repository and previously agreed project decisions. Preserve all legitimate data, existing forms, working design, and functionality. Implement the required features, fix real bugs, connect every module correctly, and verify the result. Do not claim success without evidence.

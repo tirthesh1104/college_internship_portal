@@ -1,0 +1,2 @@
+=== ipts/frontend/src/App.tsx (fallback: 1) ===
+  {/* Catch-all fallback */}

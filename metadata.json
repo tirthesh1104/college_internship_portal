@@ -1,0 +1,8 @@
+{
+  "name": "IPTS - Internship Performance Tracking System",
+  "description": "Production portal for MITCORER student internships, weekly progress evaluations, skill assessments, document verification, and accredited institutional tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

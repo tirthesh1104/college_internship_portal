@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Exec(npm run)",
+      "Exec(rm)",
+      "Exec(del)"
+    ]
+  }
+}
