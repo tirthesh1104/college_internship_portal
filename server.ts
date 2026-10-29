@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response, NextFunction } from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -254,7 +255,7 @@ function getDefaultAIConfig(): AIConfigData {
     active_provider: 'GEMINI',
     gemini: {
       api_key: defaultGeminiKey,
-      selected_model: 'gemini-2.0-flash',
+      selected_model: 'gemini-3.1-flash-lite',
       is_connected: Boolean(defaultGeminiKey)
     },
     claude: {
@@ -346,8 +347,8 @@ async function testGeminiConnection(apiKey: string, modelName: string) {
     apiKey,
     httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
   });
-  const requestedModel = modelName || 'gemini-2.0-flash';
-  const candidateModels = Array.from(new Set([requestedModel, 'gemini-2.0-flash', 'gemini-1.5-flash']));
+  const requestedModel = modelName || 'gemini-3.1-flash-lite';
+  const candidateModels = Array.from(new Set([requestedModel, 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash']));
   let lastError: any = null;
   for (const model of candidateModels) {
     try {
@@ -433,8 +434,8 @@ async function generateAIResponse(
     if (candidateKeys.length === 0) {
       throw new Error('Google Gemini API credentials are not configured.');
     }
-    const primaryModel = aiConfig.gemini.selected_model || 'gemini-2.0-flash';
-    const candidateModels = Array.from(new Set([primaryModel, 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-pro']));
+    const primaryModel = aiConfig.gemini.selected_model || 'gemini-3.1-flash-lite';
+    const candidateModels = Array.from(new Set([primaryModel, 'gemini-3.1-flash-lite', 'gemini-3.8-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-pro']));
     let lastError: any = null;
     for (const candidateKey of candidateKeys) {
       for (const candidateModel of candidateModels) {
@@ -1148,7 +1149,7 @@ function loadStore(): DataStore {
           parsed.ai_config.gemini = {
             ...(parsed.ai_config.gemini || {}),
             api_key: (process.env.GEMINI_API_KEY || '').trim(),
-            selected_model: parsed.ai_config.gemini?.selected_model || 'gemini-2.0-flash',
+            selected_model: parsed.ai_config.gemini?.selected_model || 'gemini-3.1-flash-lite',
             is_connected: Boolean(process.env.GEMINI_API_KEY)
           };
           modified = true;
@@ -6028,15 +6029,17 @@ app.get('/api/admin/ai-config/', (req: Request, res: Response) => {
       provider_name: 'Google Gemini',
       api_key_masked: maskApiKey(config.gemini.api_key),
       has_key: Boolean(config.gemini.api_key),
-      selected_model: config.gemini.selected_model || 'gemini-2.0-flash',
+      selected_model: config.gemini.selected_model || 'gemini-3.1-flash-lite',
       is_connected: Boolean(config.gemini.is_connected),
       last_tested_at: config.gemini.last_tested_at || null,
       error_message: config.gemini.error_message || '',
       supported_models: [
-        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash (Recommended Default)' },
-        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Fast & Lightweight)' },
-        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash (Balanced)' },
-        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro (Complex Reasoning)' }
+        { id: 'gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite (Recommended Default)' },
+        { id: 'gemini-3.8-flash', name: 'Gemini 3.8 Flash' },
+        { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
       ]
     },
     claude: {
@@ -6220,7 +6223,7 @@ app.post('/api/admin/ai-config/test-connection/', async (req: Request, res: Resp
         return res.status(400).json({ error: 'Please enter a Google Gemini API key before testing connection.' });
       }
 
-      const modelToUse = model || store.ai_config.gemini.selected_model || 'gemini-2.0-flash';
+      const modelToUse = model || store.ai_config.gemini.selected_model || 'gemini-3.1-flash-lite';
       const result = await testGeminiConnection(keyToUse, modelToUse);
 
       store.ai_config.gemini.api_key = keyToUse;
