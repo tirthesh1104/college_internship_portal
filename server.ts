@@ -23,8 +23,16 @@ const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || 'ipts_mitcorer_
 
 // Note: A 1-4 digit numeric PIN has low entropy (max 10,000 combinations).
 // Strong brute-force protection (per-IP rate limiting and audit logging) is enforced.
-const RAW_ENV_ADMIN_PIN = (process.env.ADMIN_SECURITY_PIN || '').trim();
-const ADMIN_SECURITY_PIN = /^\d{1,4}$/.test(RAW_ENV_ADMIN_PIN) ? RAW_ENV_ADMIN_PIN : '1234';
+const ADMIN_SECURITY_PIN = (() => {
+  const envPin = (process.env.ADMIN_SECURITY_PIN || '').trim();
+  if (envPin) {
+    if (/^\d{1,4}$/.test(envPin)) {
+      return envPin;
+    }
+    console.warn(`[SECURITY] Configured ADMIN_SECURITY_PIN "${envPin}" does not match 1-4 digits limit! Defaulting to "1234".`);
+  }
+  return '1234';
+})();
 
 function isValidAdminPinFormat(pin: string): boolean {
   if (!pin || typeof pin !== 'string') return false;
@@ -43,21 +51,14 @@ function verifyAdminSecurityPin(providedPin: string): { valid: boolean; reason?:
     return { valid: false, reason: 'Admin Security PIN must be strictly 1 to 4 digits.' };
   }
 
-  // If explicitly configured in environment as 1-4 digits, strictly match it (preserving leading zeros)
-  if (RAW_ENV_ADMIN_PIN && isValidAdminPinFormat(RAW_ENV_ADMIN_PIN)) {
-    return { valid: clean === RAW_ENV_ADMIN_PIN };
-  }
-
-  // Safe migration fallback when no custom environment PIN is set:
-  // Accept standard 4-digit default '1234' or previous 3-digit default '123'
-  const isMatch = clean === '1234' || clean === '123';
-  return { valid: isMatch };
+  // Single authoritative check against configured ADMIN_SECURITY_PIN (preserving leading zeros)
+  return { valid: clean === ADMIN_SECURITY_PIN };
 }
 
 function verifyCoordinatorSecurityPin(providedPin: string): boolean {
   if (!providedPin) return false;
   const clean = providedPin.trim();
-  return clean === COORDINATOR_SECURITY_PIN || clean === '77';
+  return clean === COORDINATOR_SECURITY_PIN;
 }
 
 // In-memory rate limiting for authentication attempts (per IP address)
@@ -99,6 +100,70 @@ if (IS_VERCEL && !fs.existsSync(DATA_FILE) && fs.existsSync(SEED_DATA_FILE)) {
     console.warn('[DB] Could not copy seed store to /tmp:', err);
   }
 }
+
+// ============================================================================
+// DURABLE PERSISTENCE ADAPTER (Vercel KV / Upstash Redis / Remote REST DB)
+// ============================================================================
+const KV_URL = (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '').replace(/\/$/, '');
+const KV_TOKEN = (process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '').trim();
+const HAS_DURABLE_STORAGE = Boolean(KV_URL && KV_TOKEN);
+let durableStoreLoaded = false;
+
+async function syncFromRemoteStorage(): Promise<boolean> {
+  if (!HAS_DURABLE_STORAGE) return false;
+  try {
+    const res = await fetch(`${KV_URL}/get/ipts_db_store`, {
+      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+    });
+    if (res.ok) {
+      const json: any = await res.json();
+      if (json && json.result) {
+        const remoteData = typeof json.result === 'string' ? JSON.parse(json.result) : json.result;
+        if (remoteData && Array.isArray(remoteData.users)) {
+          memoryStore = remoteData;
+          durableStoreLoaded = true;
+          try {
+            fs.writeFileSync(DATA_FILE, JSON.stringify(remoteData, null, 2), 'utf-8');
+          } catch (_) {}
+          return true;
+        }
+      } else {
+        // If remote store is empty on first deployment, seed from baseline store
+        const baseline = memoryStore || (fs.existsSync(DATA_FILE) ? JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8')) : getInitialStore());
+        await syncToRemoteStorage(baseline);
+        durableStoreLoaded = true;
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('[STORAGE] Failed to sync from remote KV store:', err);
+  }
+  return false;
+}
+
+async function syncToRemoteStorage(store: any): Promise<void> {
+  if (!HAS_DURABLE_STORAGE) return;
+  try {
+    await fetch(`${KV_URL}/set/ipts_db_store`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${KV_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(store)
+    });
+  } catch (err) {
+    console.warn('[STORAGE] Failed to write to remote KV store:', err);
+  }
+}
+
+// Middleware to ensure remote store is synchronized on cold start
+app.use(async (_req: Request, _res: Response, next: NextFunction) => {
+  if (HAS_DURABLE_STORAGE && !durableStoreLoaded) {
+    await syncFromRemoteStorage();
+  }
+  next();
+});
 
 interface UserRecord {
   id: number;
@@ -1215,6 +1280,11 @@ function saveStore(store: DataStore) {
     fs.writeFileSync(DATA_FILE, JSON.stringify(store, null, 2), 'utf-8');
   } catch (err) {
     console.warn('[DB] Non-fatal: write to disk skipped in serverless environment:', err);
+  }
+  if (HAS_DURABLE_STORAGE) {
+    syncToRemoteStorage(store).catch((err) => {
+      console.warn('[STORAGE] Async remote persistence failed:', err);
+    });
   }
 }
 
