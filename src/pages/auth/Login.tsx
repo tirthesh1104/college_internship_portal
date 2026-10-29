@@ -66,6 +66,23 @@ export const Login: React.FC = () => {
   const handleStaffSubmit = async (e: React.FormEvent, role: 'COORDINATOR' | 'ADMIN') => {
     e.preventDefault();
     setError('');
+
+    if (role === 'ADMIN') {
+      const trimmedPin = securityPin.trim();
+      if (!trimmedPin) {
+        setError('Admin Security PIN is required.');
+        return;
+      }
+      if (!/^\d+$/.test(trimmedPin)) {
+        setError('Admin Security PIN must contain digits only.');
+        return;
+      }
+      if (trimmedPin.length < 1 || trimmedPin.length > 4) {
+        setError('Admin Security PIN must be strictly 1 to 4 digits.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -381,18 +398,24 @@ export const Login: React.FC = () => {
             )}
 
             <div className="form-group">
-              <label className="form-label">Admin Secret Access Key / PIN *</label>
+              <label className="form-label">Admin Secret Access Key / PIN (1–4 Digits) *</label>
               <div style={{ position: 'relative' }}>
                 <Shield size={18} style={{ position: 'absolute', left: '12px', top: '11px', color: '#7c3aed' }} />
                 <input
                   type={showPin ? 'text' : 'password'}
                   required
                   autoFocus
+                  maxLength={4}
+                  inputMode="numeric"
+                  pattern="[0-9]{1,4}"
                   className="form-control"
                   style={{ paddingLeft: '38px', paddingRight: '38px' }}
-                  placeholder="Enter Admin Secret PIN"
+                  placeholder="Enter 1–4 digit Admin PIN"
                   value={securityPin}
-                  onChange={(e) => setSecurityPin(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+                    setSecurityPin(val);
+                  }}
                 />
                 <button
                   type="button"

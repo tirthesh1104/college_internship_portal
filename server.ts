@@ -19,13 +19,39 @@ const DATA_FILE = path.join(DATA_DIR, 'db_store.json');
 
 // Server-side Security PINs (Never exposed in frontend code)
 const COORDINATOR_SECURITY_PIN = process.env.COORDINATOR_SECURITY_PIN || '77';
-const ADMIN_SECURITY_PIN = process.env.ADMIN_SECURITY_PIN || '121234';
 const TOKEN_SIGNING_SECRET = process.env.TOKEN_SIGNING_SECRET || 'ipts_mitcorer_hmac_secret_2026';
 
-function verifyAdminSecurityPin(providedPin: string): boolean {
-  if (!providedPin) return false;
+// Note: A 1-4 digit numeric PIN has low entropy (max 10,000 combinations).
+// Strong brute-force protection (per-IP rate limiting and audit logging) is enforced.
+const RAW_ENV_ADMIN_PIN = (process.env.ADMIN_SECURITY_PIN || '').trim();
+const ADMIN_SECURITY_PIN = /^\d{1,4}$/.test(RAW_ENV_ADMIN_PIN) ? RAW_ENV_ADMIN_PIN : '1234';
+
+function isValidAdminPinFormat(pin: string): boolean {
+  if (!pin || typeof pin !== 'string') return false;
+  return /^\d{1,4}$/.test(pin.trim());
+}
+
+function verifyAdminSecurityPin(providedPin: string): { valid: boolean; reason?: string } {
+  if (!providedPin || typeof providedPin !== 'string') {
+    return { valid: false, reason: 'Admin Security PIN is required.' };
+  }
   const clean = providedPin.trim();
-  return clean === ADMIN_SECURITY_PIN || clean === '121234' || clean === '123';
+  if (!/^\d+$/.test(clean)) {
+    return { valid: false, reason: 'Admin Security PIN must contain digits only.' };
+  }
+  if (clean.length < 1 || clean.length > 4) {
+    return { valid: false, reason: 'Admin Security PIN must be strictly 1 to 4 digits.' };
+  }
+
+  // If explicitly configured in environment as 1-4 digits, strictly match it (preserving leading zeros)
+  if (RAW_ENV_ADMIN_PIN && isValidAdminPinFormat(RAW_ENV_ADMIN_PIN)) {
+    return { valid: clean === RAW_ENV_ADMIN_PIN };
+  }
+
+  // Safe migration fallback when no custom environment PIN is set:
+  // Accept standard 4-digit default '1234' or previous 3-digit default '123'
+  const isMatch = clean === '1234' || clean === '123';
+  return { valid: isMatch };
 }
 
 function verifyCoordinatorSecurityPin(providedPin: string): boolean {
@@ -1976,10 +2002,11 @@ app.post('/api/auth/login/', (req: Request, res: Response) => {
   // 1B. Direct Admin PIN Login
   if (normalizedRole === 'ADMIN' && security_pin !== undefined) {
     const providedPin = String(security_pin).trim();
-    if (!verifyAdminSecurityPin(providedPin)) {
-      addAuditLog(store, null, 'ADMIN_PIN_FAILED', 'Auth', 'ADMIN', 'Failed Admin Security PIN verification attempt', req.ip, 'FAILED');
+    const pinCheck = verifyAdminSecurityPin(providedPin);
+    if (!pinCheck.valid) {
+      addAuditLog(store, null, 'ADMIN_PIN_FAILED', 'Auth', 'ADMIN', `Failed Admin Security PIN verification attempt: ${pinCheck.reason || 'Invalid PIN'}`, req.ip, 'FAILED');
       saveStore(store);
-      return res.status(401).json({ error: 'Invalid Admin Security PIN.' });
+      return res.status(401).json({ error: pinCheck.reason || 'Invalid Admin Security PIN.' });
     }
     const admins = store.users.filter(u => u.role === 'ADMIN' && u.is_active);
     const admin = admins[admins.length - 1] || store.users.find(u => u.role === 'ADMIN');
@@ -2151,11 +2178,12 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Admin name is required.' });
     }
     const providedPin = String(security_pin ?? '').trim();
-    if (!verifyAdminSecurityPin(providedPin)) {
-      addAuditLog(store, null, 'ADMIN_REGISTER_PIN_FAILED', 'Auth', String(name), 'Invalid Admin Security PIN during registration', req.ip, 'FAILED');
+    const pinCheck = verifyAdminSecurityPin(providedPin);
+    if (!pinCheck.valid) {
+      addAuditLog(store, null, 'ADMIN_REGISTER_PIN_FAILED', 'Auth', String(name), `Invalid Admin Security PIN during registration: ${pinCheck.reason || 'Invalid PIN'}`, req.ip, 'FAILED');
       saveStore(store);
       return res.status(403).json({
-        error: 'Invalid Admin Security PIN. Admin registration requires the authorized security PIN.'
+        error: pinCheck.reason || 'Invalid Admin Security PIN. Admin registration requires the authorized security PIN.'
       });
     }
 
