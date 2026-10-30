@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
 import { UserPlus, Search, Filter, ShieldCheck, Mail, BookOpen, UserCheck, MessageSquare } from 'lucide-react';
 
 interface TeamListing {
@@ -20,9 +21,8 @@ export const ProjectTeamFinder: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [joinSuccess, setJoinSuccess] = useState<string | null>(null);
 
-  const initialTeams: TeamListing[] = [];
-
-  const [teams, setTeams] = useState<TeamListing[]>(initialTeams);
+  const [teams, setTeams] = useState<TeamListing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [newTeam, setNewTeam] = useState({
     title: '',
     description: '',
@@ -31,32 +31,68 @@ export const ProjectTeamFinder: React.FC = () => {
     maxMembers: 4
   });
 
-  const handleJoin = (teamTitle: string) => {
-    setJoinSuccess(`Application request sent to the project lead of "${teamTitle}". They will contact you via your college email.`);
-    setTimeout(() => setJoinSuccess(null), 6000);
+  const fetchTeams = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get<any[]>('/teams/');
+      const list = Array.isArray(res) ? res : [];
+      setTeams(list.map((t: any) => ({
+        id: t.id,
+        project_title: t.project_title || t.title || 'Untitled Project',
+        lead_name: t.lead_name || 'Student Lead',
+        department: t.department || 'Computer Science & Engineering',
+        academic_year: t.academic_year || '3rd Year',
+        description: t.description || '',
+        open_roles: Array.isArray(t.open_roles) ? t.open_roles : (t.open_roles ? String(t.open_roles).split(',') : ['Developer']),
+        skills_required: Array.isArray(t.skills_required || t.required_skills) ? (t.skills_required || t.required_skills) : ['React'],
+        members_count: Number(t.members_count || (t.members ? t.members.length : 1)),
+        max_members: Number(t.max_members || 4),
+        status: (t.status === 'FULL' || t.status === 'RECRUITING') ? t.status : 'RECRUITING'
+      })));
+    } catch (err) {
+      console.error('Failed to fetch teams:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreateTeam = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchTeams();
+  }, []);
+
+  const handleJoin = async (teamTitle: string, teamId?: number) => {
+    try {
+      if (teamId) {
+        await api.post(`/teams/${teamId}/join/`, {});
+        fetchTeams();
+      }
+      setJoinSuccess(`Application request sent to the project lead of "${teamTitle}". They will contact you via your college email.`);
+      setTimeout(() => setJoinSuccess(null), 6000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to join team');
+    }
+  };
+
+  const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTeam.title || !newTeam.description) return;
 
-    const created: TeamListing = {
-      id: Date.now(),
-      project_title: newTeam.title,
-      lead_name: 'Current Student',
-      department: 'Computer Science & Engineering',
-      academic_year: '3rd Year',
-      description: newTeam.description,
-      open_roles: newTeam.openRoles.split(',').map(s => s.trim()).filter(Boolean),
-      skills_required: newTeam.skills.split(',').map(s => s.trim()).filter(Boolean),
-      members_count: 1,
-      max_members: Number(newTeam.maxMembers),
-      status: 'RECRUITING'
-    };
-
-    setTeams([created, ...teams]);
-    setShowCreateModal(false);
-    setNewTeam({ title: '', description: '', openRoles: '', skills: '', maxMembers: 4 });
+    try {
+      await api.post('/teams/', {
+        project_title: newTeam.title,
+        title: newTeam.title,
+        description: newTeam.description,
+        open_roles: newTeam.openRoles.split(',').map(s => s.trim()).filter(Boolean),
+        skills_required: newTeam.skills.split(',').map(s => s.trim()).filter(Boolean),
+        required_skills: newTeam.skills.split(',').map(s => s.trim()).filter(Boolean),
+        max_members: Number(newTeam.maxMembers)
+      });
+      setShowCreateModal(false);
+      setNewTeam({ title: '', description: '', openRoles: '', skills: '', maxMembers: 4 });
+      fetchTeams();
+    } catch (err: any) {
+      alert(err.message || 'Failed to create team');
+    }
   };
 
   const filteredTeams = teams.filter(t => 
@@ -171,7 +207,7 @@ export const ProjectTeamFinder: React.FC = () => {
 
               {team.status === 'RECRUITING' ? (
                 <button 
-                  onClick={() => handleJoin(team.project_title)}
+                  onClick={() => handleJoin(team.project_title, team.id)}
                   className="btn btn-outline"
                   style={{ fontSize: '0.85rem', padding: '6px 12px' }}
                 >

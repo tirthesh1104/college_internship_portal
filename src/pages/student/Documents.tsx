@@ -67,13 +67,22 @@ export const Documents: React.FC = () => {
     setSuccess('');
 
     try {
+      // Encode file to data URL for preview and permanent persistence
+      const dataUrl = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(selectedFile);
+      });
+
       await api.post('/documents/', {
         title: title.trim() || selectedFile.name,
         document_type: documentType,
         issuing_organization: issuingOrg.trim() || 'Host Organization',
         verification_reference: verificationRef.trim() || `REF-${Date.now().toString().slice(-6)}`,
         file_name: selectedFile.name,
-        file_size: selectedFile.size
+        file_size: selectedFile.size,
+        file_data_url: dataUrl
       });
       setSuccess('Document uploaded successfully and queued for coordinator verification.');
       setTimeout(() => {

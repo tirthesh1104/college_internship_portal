@@ -14,7 +14,12 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const IS_VERCEL = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
-const SEED_DATA_FILE = path.join(__dirname, 'data', 'db_store.json');
+const candidateSeedPaths = [
+  path.join(__dirname, 'data', 'db_store.json'),
+  path.join(__dirname, '..', 'data', 'db_store.json'),
+  path.join(process.cwd(), 'data', 'db_store.json')
+];
+const SEED_DATA_FILE = candidateSeedPaths.find(p => fs.existsSync(p)) || candidateSeedPaths[0];
 const DATA_DIR = IS_VERCEL ? os.tmpdir() : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'db_store.json');
 
@@ -262,6 +267,8 @@ interface DataStore {
   audit_logs: any[];
   assessments: any[];
   feedback: any[];
+  mentors?: any[];
+  mentor_sessions?: any[];
   academic_config?: AcademicConfig;
   ai_config?: AIConfigData;
 }
@@ -924,7 +931,48 @@ function getDefaultFeedback(): any[] {
   ];
 }
 
-function getInitialStore(): DataStore {
+function getDefaultMentors() {
+  return [
+    {
+      id: 1,
+      mentor_name: 'Pooja Patil',
+      designation: 'Senior Cloud Architect',
+      organization: 'Google Cloud India',
+      bio: 'MITCORER 2020 Alumna with 5+ years building distributed cloud platforms and scalable Kubernetes clusters.',
+      expertise_areas: 'Cloud Computing, System Design, Go, Python',
+      available: true
+    },
+    {
+      id: 2,
+      mentor_name: 'Rohan Deshmukh',
+      designation: 'Full Stack Tech Lead',
+      organization: 'Tata Consultancy Services',
+      bio: 'Leading enterprise engineering teams at TCS. Passionate about mentoring students in React, Node.js, and clean architecture.',
+      expertise_areas: 'React, TypeScript, Express, PostgreSQL',
+      available: true
+    },
+    {
+      id: 3,
+      mentor_name: 'Snehal Shinde',
+      designation: 'DevOps & SRE Specialist',
+      organization: 'Infosys Ltd',
+      bio: 'Specialist in CI/CD automation, Docker, AWS, and production reliability for high-traffic financial systems.',
+      expertise_areas: 'DevOps, CI/CD, Docker, Kubernetes, AWS',
+      available: true
+    },
+    {
+      id: 4,
+      mentor_name: 'Amit Joshi',
+      designation: 'AI/ML Research Engineer',
+      organization: 'Cognizant AI Labs',
+      bio: 'Working on LLM fine-tuning, retrieval-augmented generation (RAG), and data science pipelines.',
+      expertise_areas: 'Machine Learning, PyTorch, Generative AI, Python',
+      available: true
+    }
+  ];
+}
+
+function getDefaultStore(): DataStore {
   return {
     users: [
       {
@@ -1020,8 +1068,31 @@ function getInitialStore(): DataStore {
     ],
     assessments: [],
     feedback: getDefaultFeedback(),
+    mentors: getDefaultMentors(),
+    mentor_sessions: [],
     academic_config: getDefaultAcademicConfig()
   };
+}
+
+function getInitialStore(): DataStore {
+  const filePath = fs.existsSync(DATA_FILE) ? DATA_FILE : (fs.existsSync(SEED_DATA_FILE) ? SEED_DATA_FILE : null);
+  if (filePath) {
+    try {
+      const baseline = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      if (Array.isArray(baseline.users)) {
+        // Exclude soft-deleted/stale students on cold start
+        const activeStudents = baseline.users.filter((u: UserRecord) => u.is_active !== false);
+        return {
+          ...baseline,
+          users: activeStudents
+        };
+      }
+      return baseline;
+    } catch (err) {
+      console.warn('[DB] Could not parse baseline data file, using default store:', err);
+    }
+  }
+  return getDefaultStore();
 }
 
 function normalizeDepartmentInfo(deptInput: any, deptCodeInput?: any): { id: number; code: string; name: string } {
@@ -1183,6 +1254,14 @@ function loadStore(): DataStore {
       }
       if (!parsed.academic_config) {
         parsed.academic_config = getDefaultAcademicConfig();
+        modified = true;
+      }
+      if (!Array.isArray(parsed.mentors) || parsed.mentors.length === 0) {
+        parsed.mentors = getDefaultMentors();
+        modified = true;
+      }
+      if (!Array.isArray(parsed.mentor_sessions)) {
+        parsed.mentor_sessions = [];
         modified = true;
       }
       if (!parsed.ai_config) {
@@ -2072,8 +2151,34 @@ function buildStudentSummary(u: UserRecord, store: DataStore): any {
 }
 
 // ============================================================================
-// 1. AUTHENTICATION, REGISTRATION & ACADEMIC YEAR CONFIGURATION ROUTES
+// 1. SYSTEM HEALTH, AUTHENTICATION, REGISTRATION & CONFIGURATION ROUTES
 // ============================================================================
+
+app.get('/api/health/', (_req: Request, res: Response) => {
+  const store = loadStore();
+  const activeStudents = store.users.filter(u => u.role === 'STUDENT' && u.is_active !== false).length;
+  const activeCoords = store.users.filter(u => u.role === 'COORDINATOR' && u.is_active !== false).length;
+  const activeAdmins = store.users.filter(u => u.role === 'ADMIN' && u.is_active !== false).length;
+  return res.json({
+    status: 'HEALTHY',
+    system: 'MAEER MITCORER Barshi - IPTS Enterprise Backend',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: IS_VERCEL ? 'vercel-serverless' : 'local-node',
+    durable_storage: HAS_DURABLE_STORAGE,
+    database_file: DATA_FILE,
+    seed_file: SEED_DATA_FILE,
+    metrics: {
+      total_users: store.users.length,
+      active_students: activeStudents,
+      coordinators: activeCoords,
+      admins: activeAdmins,
+      internships: store.internships.length,
+      reports: store.reports.length
+    }
+  });
+});
+app.get('/api/health', (req: Request, res: Response) => res.redirect('/api/health/'));
 
 app.post('/api/auth/login/', (req: Request, res: Response) => {
   try {
@@ -2359,20 +2464,6 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
   }
 
-  if (store.users.some(u => u.email.toLowerCase() === cleanEmail)) {
-    return res.status(400).json({ error: 'An account with this email address already exists.' });
-  }
-
-  const cleanRoll = String(roll_number).trim().toUpperCase();
-  if (store.users.some(u => u.student_profile?.roll_number?.toUpperCase() === cleanRoll)) {
-    return res.status(400).json({ error: 'A student with this Roll Number is already registered.' });
-  }
-
-  const cleanPrn = prn_number ? String(prn_number).trim().toUpperCase() : '';
-  if (cleanPrn && store.users.some(u => u.student_profile?.prn_number?.toUpperCase() === cleanPrn)) {
-    return res.status(400).json({ error: 'A student with this PRN Number is already registered.' });
-  }
-
   const selectedAcadYear = normalizeAcademicYearValue(
     academic_year,
     store.academic_config?.current_academic_year || '2026-2027'
@@ -2386,6 +2477,80 @@ app.post('/api/auth/register/', (req: Request, res: Response) => {
       normalizeDepartmentInfo(u.coordinator_profile?.department_id, u.coordinator_profile?.department_code).code === selectedDept.code
   );
   const defaultCoord = deptCoordinators[deptCoordinators.length - 1] || null;
+  const cleanRoll = String(roll_number).trim().toUpperCase();
+  const cleanPrn = prn_number ? String(prn_number).trim().toUpperCase() : '';
+
+  const existingUser = store.users.find(u => u.email.toLowerCase() === cleanEmail);
+  if (existingUser) {
+    if (existingUser.is_active === false) {
+      // Reactivate previously soft-deleted student account with new registration details
+      existingUser.is_active = true;
+      existingUser.name = String(name).trim();
+      existingUser.passwordHash = hashPassword(String(password));
+      existingUser.student_profile = {
+        id: existingUser.student_profile?.id || Date.now() + 1,
+        roll_number: cleanRoll,
+        prn_number: cleanPrn,
+        department_id: deptIdNum,
+        department_code: selectedDept.code,
+        department_name: selectedDept.name,
+        academic_year: selectedAcadYear,
+        admission_year: admission_year || selectedAcadYear.split('-')[0] || '2026',
+        graduation_year: graduation_year || String((parseInt(selectedAcadYear.split('-')[0] || '2026', 10) + 4)),
+        registration_date: registration_date || new Date().toISOString().split('T')[0],
+        division: division ? String(division).trim().toUpperCase() : 'A',
+        semester: 6,
+        cgpa: '0.00',
+        skills: [],
+        assigned_coordinator_id: defaultCoord ? defaultCoord.id : null,
+        assigned_coordinator_name: defaultCoord ? defaultCoord.name : null,
+        is_verified: true
+      };
+
+      notifyCoordinators(
+        store,
+        existingUser,
+        `Student Re-registered: ${existingUser.name}`,
+        `${existingUser.name} (${cleanRoll} • ${selectedDept.code} • ${selectedAcadYear}) re-registered on MITCORER IPTS.`,
+        'STUDENT_REGISTRATION',
+        `/coordinator/students/${existingUser.id}`
+      );
+      store.users.filter(u => u.role === 'ADMIN').forEach(adm => {
+        addNotification(
+          store,
+          adm.id,
+          `Student Re-registered: ${existingUser.name}`,
+          `${existingUser.name} (${cleanRoll} • ${selectedDept.code} • ${selectedAcadYear}) re-registered and is now active.`,
+          'STUDENT_REGISTRATION',
+          `/admin/students/${existingUser.id}`
+        );
+      });
+
+      addAuditLog(store, existingUser, 'STUDENT_RE_REGISTER', 'User', String(existingUser.id), `Student ${existingUser.name} (${cleanRoll}) reactivated account`, req.ip, 'SUCCESS');
+      saveStore(store);
+
+      resetAuthRateLimit(clientIp);
+      const token = createToken(existingUser);
+      const { passwordHash, ...safeUser } = existingUser;
+      return res.status(201).json({
+        message: 'Student registration completed successfully.',
+        access: token,
+        refresh: `ref_${token}`,
+        tokens: { access: token, refresh: `ref_${token}` },
+        user: safeUser
+      });
+    } else {
+      return res.status(400).json({ error: 'An account with this email address already exists.' });
+    }
+  }
+
+  if (store.users.some(u => u.student_profile?.roll_number?.toUpperCase() === cleanRoll && u.is_active !== false)) {
+    return res.status(400).json({ error: 'A student with this Roll Number is already registered.' });
+  }
+
+  if (cleanPrn && store.users.some(u => u.student_profile?.prn_number?.toUpperCase() === cleanPrn && u.is_active !== false)) {
+    return res.status(400).json({ error: 'A student with this PRN Number is already registered.' });
+  }
 
   const newUser: UserRecord = {
     id: Date.now(),
@@ -2750,6 +2915,7 @@ const handleStaffStudentsList = (req: Request, res: Response) => {
   const store = loadStore();
   const visibleStudents = store.users.filter(u => {
     if (u.role !== 'STUDENT') return false;
+    if (u.is_active === false) return false;
     if (user.role === 'ADMIN') return true;
     return isCoordinatorAuthorizedForStudent(user, u, store);
   });
@@ -2845,7 +3011,7 @@ const handleGetStudentDetail = (req: Request, res: Response) => {
   }
 
   const store = loadStore();
-  const target = store.users.find(u => u.id === requestedId && u.role === 'STUDENT');
+  const target = store.users.find(u => u.id === requestedId && u.role === 'STUDENT' && u.is_active !== false);
   if (!target) {
     return res.status(404).json({ error: 'Student record not found.' });
   }
@@ -2933,7 +3099,7 @@ const handleDeleteStudent = (req: Request, res: Response) => {
 
   const store = loadStore();
   const target = store.users.find(
-    u => u.role === 'STUDENT' && (u.id === requestedId || u.student_profile?.id === requestedId)
+    u => u.role === 'STUDENT' && (u.id === requestedId || u.student_profile?.id === requestedId) && u.is_active !== false
   );
   if (!target) {
     return res.status(404).json({ error: 'Student account not found or has already been deleted.' });
@@ -2972,8 +3138,8 @@ const handleDeleteStudent = (req: Request, res: Response) => {
   const removedTasks = store.tasks.filter(t => t.student === sid || t.student_id === sid).length;
   const removedAssessments = store.assessments.filter(a => a.student === sid || a.student_id === sid).length;
 
-  // Remove student user and associated records so no orphan references remain
-  store.users = store.users.filter(u => u.id !== sid);
+  // Soft delete student: set is_active = false so account is inactive and does not reappear on cold start
+  store.users = store.users.map(u => u.id === sid ? { ...u, is_active: false } : u);
   store.internships = store.internships.filter(i => i.student !== sid && i.student_id !== sid);
   store.applications = store.applications.filter(a => a.student !== sid && a.student_id !== sid);
   store.reports = store.reports.filter(r => r.student !== sid && r.student_id !== sid);
@@ -4110,6 +4276,119 @@ app.get('/api/reports/summary/', (req: Request, res: Response) => {
   });
 });
 
+// Real-Time Student Leaderboard Endpoint
+const handleGetLeaderboard = (_req: Request, res: Response) => {
+  const store = loadStore();
+  const students = store.users.filter(u => u.role === 'STUDENT' && u.is_active !== false);
+
+  const entries = students.map((stu, idx) => {
+    const studentReports = store.reports.filter(r => (r.student === stu.id || r.student_id === stu.id) && r.status === 'APPROVED');
+    const studentAssessments = store.assessments.filter(a => a.student === stu.id || a.student_id === stu.id);
+
+    let reportPoints = 0;
+    studentReports.forEach(r => {
+      const score = (r.feedback_entries && r.feedback_entries[0]?.score) || 85;
+      reportPoints += Math.floor(parseFloat(String(score)) || 80);
+    });
+
+    let assessmentPoints = 0;
+    studentAssessments.forEach(a => {
+      assessmentPoints += Math.floor(parseFloat(String(a.score)) || 75);
+    });
+
+    const totalPoints = reportPoints + assessmentPoints;
+    const streak = studentReports.length;
+    let badgesCount = 0;
+    if (studentReports.length >= 1) badgesCount++;
+    if (streak >= 4) badgesCount++;
+    if (streak >= 8) badgesCount++;
+    if (store.internships.some(i => (i.student === stu.id || i.student_id === stu.id) && i.status === 'COMPLETED')) badgesCount++;
+    if (totalPoints >= 150) badgesCount++;
+
+    const avatarColors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4', '#ef4444'];
+    const deptInfo = normalizeDepartmentInfo(stu.student_profile?.department_id, stu.student_profile?.department_code);
+
+    return {
+      id: stu.id,
+      name: stu.name,
+      roll_number: stu.student_profile?.roll_number || 'N/A',
+      department: deptInfo.name,
+      department_code: deptInfo.code,
+      total_points: totalPoints,
+      badges_count: badgesCount,
+      current_streak: streak,
+      avatar_color: avatarColors[idx % avatarColors.length]
+    };
+  });
+
+  entries.sort((a, b) => b.total_points - a.total_points || b.current_streak - a.current_streak);
+
+  const ranked = entries.map((e, index) => ({
+    rank: index + 1,
+    ...e
+  }));
+
+  return res.json(ranked);
+};
+
+app.get('/api/leaderboard/', handleGetLeaderboard);
+app.get('/api/leaderboard', handleGetLeaderboard);
+app.get('/api/reports/leaderboard/', handleGetLeaderboard);
+app.get('/api/reports/leaderboard', handleGetLeaderboard);
+
+// Alumni & Industry Mentor Connect Endpoints
+app.get('/api/mentors/mentors/', (_req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json(store.mentors || getDefaultMentors());
+});
+app.get('/api/mentors/', (_req: Request, res: Response) => {
+  const store = loadStore();
+  return res.json(store.mentors || getDefaultMentors());
+});
+
+app.get('/api/mentors/sessions/', (req: Request, res: Response) => {
+  const user = getAuthUser(req);
+  if (!user) return res.status(401).json({ error: 'Authentication required.' });
+  const store = loadStore();
+  const sessions = (store.mentor_sessions || []).filter(
+    (s: any) => user.role === 'ADMIN' || s.student === user.id || s.student_id === user.id
+  );
+  return res.json(sessions);
+});
+
+app.post('/api/mentors/sessions/', (req: Request, res: Response) => {
+  const user = getAuthUser(req);
+  if (!user) return res.status(401).json({ error: 'Authentication required.' });
+  const store = loadStore();
+  if (!Array.isArray(store.mentor_sessions)) {
+    store.mentor_sessions = [];
+  }
+  const { mentor: mentorId, topic, scheduled_at, learning_goals } = req.body;
+  const mentors = store.mentors || getDefaultMentors();
+  const targetMentor = mentors.find((m: any) => m.id === Number(mentorId));
+
+  const newSession = {
+    id: Date.now(),
+    mentor: Number(mentorId),
+    mentor_name: targetMentor ? targetMentor.mentor_name : 'Assigned Mentor',
+    student: user.id,
+    student_id: user.id,
+    student_name: user.name,
+    topic: topic || 'Career Guidance & Architecture Review',
+    scheduled_at: scheduled_at || new Date(Date.now() + 86400000 * 3).toISOString(),
+    learning_goals: learning_goals || '',
+    status: 'CONFIRMED',
+    created_at: new Date().toISOString()
+  };
+
+  store.mentor_sessions.unshift(newSession);
+  addAuditLog(store, user, 'MENTOR_SESSION_BOOKED', 'MentorSession', String(newSession.id), `Booked mentorship session with ${newSession.mentor_name}`, req.ip, 'SUCCESS');
+  addNotification(store, user.id, 'Mentorship Session Confirmed', `Your 1-on-1 mentorship session with ${newSession.mentor_name} has been booked for ${new Date(newSession.scheduled_at).toLocaleDateString()}.`, 'MENTORSHIP', '/student/mentor-connect');
+  saveStore(store);
+
+  return res.status(201).json(newSession);
+});
+
 // Tasks Endpoints
 app.get('/api/tasks/', (req: Request, res: Response) => {
   const user = getAuthUser(req);
@@ -5019,35 +5298,154 @@ app.post('/api/community/posts/:id/moderate/', (req: Request, res: Response) => 
   return res.json({ message: 'Report dismissed.', post });
 });
 
-app.get('/api/community/teams/', (_req: Request, res: Response) => {
+// Project Teams & Collaboration Endpoints
+const handleGetTeams = (_req: Request, res: Response) => {
   const store = loadStore();
+  if (!Array.isArray(store.teams) || store.teams.length === 0) {
+    store.teams = [
+      {
+        id: 101,
+        title: 'Smart Railway Track Crack Detection IoT System',
+        project_title: 'Smart Railway Track Crack Detection IoT System',
+        lead_name: 'Aarav Kulkarni',
+        department: 'Computer Science & Engineering',
+        academic_year: '3rd Year (TE)',
+        description: 'Building an IoT embedded rover with computer vision to inspect rail alignment and ultrasonic track flaw detection.',
+        open_roles: ['Computer Vision Dev', 'IoT Firmware Engineer', 'React Dashboard Dev'],
+        skills_required: ['Python', 'OpenCV', 'Raspberry Pi', 'React'],
+        required_skills: ['Python', 'OpenCV', 'Raspberry Pi', 'React'],
+        members_count: 2,
+        max_members: 4,
+        status: 'RECRUITING',
+        created_by: 4,
+        members: [
+          { id: 1, student: 4, student_name: 'Aarav Kulkarni', role: 'Project Lead', joined_at: new Date().toISOString() },
+          { id: 2, student: 3, student_name: 'Student One', role: 'IoT Firmware Engineer', joined_at: new Date().toISOString() }
+        ],
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 102,
+        title: 'AI-Powered Campus Placement & Resume Screening Portal',
+        project_title: 'AI-Powered Campus Placement & Resume Screening Portal',
+        lead_name: 'Neha Patil',
+        department: 'Computer Science & Engineering',
+        academic_year: 'Final Year (BE)',
+        description: 'Semantic vector search using Gemini embeddings to match student internship passports directly with hiring partner criteria.',
+        open_roles: ['Backend Node/Express Dev', 'UI/UX Designer'],
+        skills_required: ['TypeScript', 'Node.js', 'Vector DB', 'TailwindCSS'],
+        required_skills: ['TypeScript', 'Node.js', 'Vector DB', 'TailwindCSS'],
+        members_count: 3,
+        max_members: 4,
+        status: 'RECRUITING',
+        created_by: 5,
+        members: [
+          { id: 1, student: 5, student_name: 'Neha Patil', role: 'Project Lead', joined_at: new Date().toISOString() }
+        ],
+        created_at: new Date().toISOString()
+      }
+    ];
+    saveStore(store);
+  }
   return res.json(store.teams);
-});
+};
 
-app.post('/api/community/teams/', (req: Request, res: Response) => {
+const handleCreateTeam = (req: Request, res: Response) => {
   const user = getAuthUser(req);
   if (!user) return res.status(401).json({ error: 'Authentication required.' });
-  const { title, description, required_skills, max_members } = req.body;
+  const { title, project_title, description, required_skills, skills_required, open_roles, max_members } = req.body;
   const store = loadStore();
+  if (!Array.isArray(store.teams)) store.teams = [];
+
+  const finalTitle = String(project_title || title || 'New Innovation Project').trim();
+  const rawSkills = skills_required || required_skills || [];
+  const parsedSkills = Array.isArray(rawSkills) ? rawSkills : String(rawSkills).split(',').map(s => s.trim()).filter(Boolean);
+  const rawRoles = open_roles || [];
+  const parsedRoles = Array.isArray(rawRoles) ? rawRoles : String(rawRoles).split(',').map(r => r.trim()).filter(Boolean);
 
   const newTeam = {
     id: Date.now(),
-    title,
-    description,
-    required_skills,
-    max_members: max_members || 4,
-    created_by: user.id,
+    title: finalTitle,
+    project_title: finalTitle,
+    description: String(description || '').trim(),
     lead_name: user.name,
-    status: 'OPEN',
+    department: user.student_profile?.department_name || 'Computer Science & Engineering',
+    academic_year: user.student_profile?.academic_year || '3rd Year',
+    open_roles: parsedRoles.length > 0 ? parsedRoles : ['Full Stack Contributor'],
+    skills_required: parsedSkills.length > 0 ? parsedSkills : ['General Programming'],
+    required_skills: parsedSkills.length > 0 ? parsedSkills : ['General Programming'],
+    max_members: Number(max_members) || 4,
+    created_by: user.id,
+    status: 'RECRUITING',
     members_count: 1,
     members: [{ id: 1, student: user.id, student_name: user.name, role: 'Project Lead', joined_at: new Date().toISOString() }],
     created_at: new Date().toISOString()
   };
 
   store.teams.unshift(newTeam);
+  addAuditLog(store, user, 'PROJECT_TEAM_CREATED', 'ProjectTeam', String(newTeam.id), `Created team "${newTeam.title}"`, req.ip, 'SUCCESS');
   saveStore(store);
   return res.status(201).json(newTeam);
-});
+};
+
+const handleJoinTeam = (req: Request, res: Response) => {
+  const user = getAuthUser(req);
+  if (!user) return res.status(401).json({ error: 'Authentication required.' });
+  const teamId = parseInt(req.params.id, 10);
+  const store = loadStore();
+  if (!Array.isArray(store.teams)) store.teams = [];
+
+  const team = store.teams.find(t => t.id === teamId);
+  if (!team) return res.status(404).json({ error: 'Project team not found.' });
+
+  if (!Array.isArray(team.members)) team.members = [];
+  const alreadyMember = team.members.some((m: any) => m.student === user.id);
+  if (alreadyMember) {
+    return res.status(400).json({ error: 'You are already a member of this project team.' });
+  }
+
+  if (team.members.length >= team.max_members) {
+    team.status = 'FULL';
+    saveStore(store);
+    return res.status(400).json({ error: 'This project team has already reached its maximum member capacity.' });
+  }
+
+  const roleName = team.open_roles && team.open_roles[team.members.length - 1] ? team.open_roles[team.members.length - 1] : 'Team Member';
+  team.members.push({
+    id: Date.now(),
+    student: user.id,
+    student_name: user.name,
+    role: roleName,
+    joined_at: new Date().toISOString()
+  });
+  team.members_count = team.members.length;
+  if (team.members_count >= team.max_members) {
+    team.status = 'FULL';
+  }
+
+  if (team.created_by && team.created_by !== user.id) {
+    addNotification(store, team.created_by, `New Member Joined "${team.title}"`, `${user.name} joined your project team as ${roleName}.`, 'TEAM_JOINED', '/student/project-team-finder');
+  }
+
+  addAuditLog(store, user, 'PROJECT_TEAM_JOINED', 'ProjectTeam', String(team.id), `Joined team "${team.title}"`, req.ip, 'SUCCESS');
+  saveStore(store);
+  return res.json({ message: `Successfully joined ${team.title}!`, team });
+};
+
+app.get('/api/teams/', handleGetTeams);
+app.get('/api/teams', handleGetTeams);
+app.get('/api/community/teams/', handleGetTeams);
+app.get('/api/community/teams', handleGetTeams);
+
+app.post('/api/teams/', handleCreateTeam);
+app.post('/api/teams', handleCreateTeam);
+app.post('/api/community/teams/', handleCreateTeam);
+app.post('/api/community/teams', handleCreateTeam);
+
+app.post('/api/teams/:id/join/', handleJoinTeam);
+app.post('/api/teams/:id/join', handleJoinTeam);
+app.post('/api/community/teams/:id/join/', handleJoinTeam);
+app.post('/api/community/teams/:id/join', handleJoinTeam);
 
 // Audit Logs (Strictly ADMIN-only with search, pagination & soft deletion)
 app.get('/api/audit-logs/', (req: Request, res: Response) => {

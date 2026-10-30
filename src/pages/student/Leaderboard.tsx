@@ -47,53 +47,55 @@ export const Leaderboard: React.FC = () => {
         if (summaryRes) {
           setMyStreak(summaryRes.current_streak || 0);
         }
-        const reportsRes = await api.get<any>('/reports/');
-        const reports = Array.isArray(reportsRes) ? reportsRes : reportsRes.results || [];
-
-        const studentMap = new Map<number, {
-          name: string;
-          roll_number?: string;
-          department?: string;
-          total_points: number;
-          badges: Set<string>;
-          max_streak: number;
-        }>();
-
-        reports.forEach((r: any) => {
-          const sid = r.student;
-          if (!studentMap.has(sid)) {
-            studentMap.set(sid, {
-              name: r.student_name || `Student ${sid}`,
-              roll_number: r.roll_number,
-              department: r.department_name || r.department_code,
-              total_points: 0,
-              badges: new Set(),
-              max_streak: 0,
-            });
+        let leaderboard: any[] = [];
+        try {
+          const lbRes = await api.get<any[]>('/leaderboard/');
+          if (Array.isArray(lbRes) && lbRes.length > 0) {
+            leaderboard = lbRes;
           }
-          const entry = studentMap.get(sid)!;
-          if (r.feedback_entries?.length > 0) {
-            entry.total_points += Math.floor(parseFloat(String(r.feedback_entries[0].score)) || 0);
-          }
-          if (r.status === 'APPROVED') {
-            entry.max_streak = Math.max(entry.max_streak, 1);
-          }
-        });
+        } catch (_) {}
 
-        const leaderboard = Array.from(studentMap.entries())
-          .map(([id, data], idx) => ({
-            rank: idx + 1,
-            id,
-            name: data.name,
-            roll_number: data.roll_number,
-            department: data.department,
-            total_points: data.total_points,
-            badges_count: data.badges.size,
-            current_streak: data.max_streak,
-            avatar_color: `hsl(${(idx * 47) % 360}, 70%, 60%)`,
-          }))
-          .sort((a, b) => b.total_points - a.total_points)
-          .map((e, idx) => ({ ...e, rank: idx + 1 }));
+        if (leaderboard.length === 0) {
+          const reportsRes = await api.get<any>('/reports/');
+          const reports = Array.isArray(reportsRes) ? reportsRes : reportsRes.results || [];
+
+          const studentMap = new Map<number, any>();
+          reports.forEach((r: any) => {
+            const sid = r.student;
+            if (!studentMap.has(sid)) {
+              studentMap.set(sid, {
+                name: r.student_name || `Student ${sid}`,
+                roll_number: r.roll_number,
+                department: r.department_name || r.department_code,
+                total_points: 0,
+                badges: new Set(),
+                max_streak: 0,
+              });
+            }
+            const entry = studentMap.get(sid)!;
+            if (r.feedback_entries?.length > 0) {
+              entry.total_points += Math.floor(parseFloat(String(r.feedback_entries[0].score)) || 0);
+            }
+            if (r.status === 'APPROVED') {
+              entry.max_streak = Math.max(entry.max_streak, 1);
+            }
+          });
+
+          leaderboard = Array.from(studentMap.entries())
+            .map(([id, data], idx) => ({
+              rank: idx + 1,
+              id,
+              name: data.name,
+              roll_number: data.roll_number,
+              department: data.department,
+              total_points: data.total_points,
+              badges_count: data.badges.size,
+              current_streak: data.max_streak,
+              avatar_color: `hsl(${(idx * 47) % 360}, 70%, 60%)`,
+            }))
+            .sort((a, b) => b.total_points - a.total_points)
+            .map((e, idx) => ({ ...e, rank: idx + 1 }));
+        }
 
         setEntries(leaderboard);
 

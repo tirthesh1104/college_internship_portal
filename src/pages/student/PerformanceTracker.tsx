@@ -38,7 +38,7 @@ useEffect(() => {
       }
     };
     loadPerformanceData();
-});
+  }, []);
   // Prepare chart data from reports
   const scoreData = reports
     .filter((r) => r.feedback_entries && r.feedback_entries.length > 0)

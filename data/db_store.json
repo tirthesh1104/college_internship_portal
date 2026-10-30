@@ -135,7 +135,94 @@
       "created_at": "2026-10-27T21:30:04.131Z"
     }
   ],
-  "teams": [],
+  "teams": [
+    {
+      "id": 101,
+      "title": "Smart Railway Track Crack Detection IoT System",
+      "project_title": "Smart Railway Track Crack Detection IoT System",
+      "lead_name": "Aarav Kulkarni",
+      "department": "Computer Science & Engineering",
+      "academic_year": "3rd Year (TE)",
+      "description": "Building an IoT embedded rover with computer vision to inspect rail alignment and ultrasonic track flaw detection.",
+      "open_roles": [
+        "Computer Vision Dev",
+        "IoT Firmware Engineer",
+        "React Dashboard Dev"
+      ],
+      "skills_required": [
+        "Python",
+        "OpenCV",
+        "Raspberry Pi",
+        "React"
+      ],
+      "required_skills": [
+        "Python",
+        "OpenCV",
+        "Raspberry Pi",
+        "React"
+      ],
+      "members_count": 2,
+      "max_members": 4,
+      "status": "RECRUITING",
+      "created_by": 4,
+      "members": [
+        {
+          "id": 1,
+          "student": 4,
+          "student_name": "Aarav Kulkarni",
+          "role": "Project Lead",
+          "joined_at": "2026-10-30T04:59:19.782Z"
+        },
+        {
+          "id": 2,
+          "student": 3,
+          "student_name": "Student One",
+          "role": "IoT Firmware Engineer",
+          "joined_at": "2026-10-30T04:59:19.782Z"
+        }
+      ],
+      "created_at": "2026-10-30T04:59:19.782Z"
+    },
+    {
+      "id": 102,
+      "title": "AI-Powered Campus Placement & Resume Screening Portal",
+      "project_title": "AI-Powered Campus Placement & Resume Screening Portal",
+      "lead_name": "Neha Patil",
+      "department": "Computer Science & Engineering",
+      "academic_year": "Final Year (BE)",
+      "description": "Semantic vector search using Gemini embeddings to match student internship passports directly with hiring partner criteria.",
+      "open_roles": [
+        "Backend Node/Express Dev",
+        "UI/UX Designer"
+      ],
+      "skills_required": [
+        "TypeScript",
+        "Node.js",
+        "Vector DB",
+        "TailwindCSS"
+      ],
+      "required_skills": [
+        "TypeScript",
+        "Node.js",
+        "Vector DB",
+        "TailwindCSS"
+      ],
+      "members_count": 3,
+      "max_members": 4,
+      "status": "RECRUITING",
+      "created_by": 5,
+      "members": [
+        {
+          "id": 1,
+          "student": 5,
+          "student_name": "Neha Patil",
+          "role": "Project Lead",
+          "joined_at": "2026-10-30T04:59:19.782Z"
+        }
+      ],
+      "created_at": "2026-10-30T04:59:19.782Z"
+    }
+  ],
   "internships": [],
   "opportunities": [
     {
@@ -2723,7 +2810,7 @@
     "claude": {
       "api_key": "",
       "selected_model": "claude-3-5-sonnet-20241022",
-      "is_connected": false,
+      "is_connected": true,
       "last_tested_at": "2026-10-28T09:00:00.000Z",
       "error_message": ""
     },
@@ -2852,5 +2939,44 @@
       "updated_at": "2026-10-28T14:31:03.740Z",
       "resolved_at": "2026-10-28T14:31:03.740Z"
     }
-  ]
+  ],
+  "mentors": [
+    {
+      "id": 1,
+      "mentor_name": "Pooja Patil",
+      "designation": "Senior Cloud Architect",
+      "organization": "Google Cloud India",
+      "bio": "MITCORER 2020 Alumna with 5+ years building distributed cloud platforms and scalable Kubernetes clusters.",
+      "expertise_areas": "Cloud Computing, System Design, Go, Python",
+      "available": true
+    },
+    {
+      "id": 2,
+      "mentor_name": "Rohan Deshmukh",
+      "designation": "Full Stack Tech Lead",
+      "organization": "Tata Consultancy Services",
+      "bio": "Leading enterprise engineering teams at TCS. Passionate about mentoring students in React, Node.js, and clean architecture.",
+      "expertise_areas": "React, TypeScript, Express, PostgreSQL",
+      "available": true
+    },
+    {
+      "id": 3,
+      "mentor_name": "Snehal Shinde",
+      "designation": "DevOps & SRE Specialist",
+      "organization": "Infosys Ltd",
+      "bio": "Specialist in CI/CD automation, Docker, AWS, and production reliability for high-traffic financial systems.",
+      "expertise_areas": "DevOps, CI/CD, Docker, Kubernetes, AWS",
+      "available": true
+    },
+    {
+      "id": 4,
+      "mentor_name": "Amit Joshi",
+      "designation": "AI/ML Research Engineer",
+      "organization": "Cognizant AI Labs",
+      "bio": "Working on LLM fine-tuning, retrieval-augmented generation (RAG), and data science pipelines.",
+      "expertise_areas": "Machine Learning, PyTorch, Generative AI, Python",
+      "available": true
+    }
+  ],
+  "mentor_sessions": []
 }
