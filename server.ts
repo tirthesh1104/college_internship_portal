@@ -1002,44 +1002,6 @@ function getDefaultStore(): DataStore {
           phone: '+91 9876543210',
           can_publish_directly: true
         }
-      },
-      {
-        id: 3,
-        name: 'Student One',
-        email: 'student1@mitcorer.edu.in',
-        role: 'STUDENT',
-        passwordHash: hashPassword('Student@123'),
-        is_active: true,
-        created_at: new Date().toISOString(),
-        student_profile: {
-          id: 3,
-          roll_number: 'MIT-2023-CS-042',
-          prn: 'PRN2023001',
-          department_id: 1,
-          department_code: 'CSE',
-          department_name: 'Computer Science & Engineering',
-          year: 'TE',
-          cgpa: 8.85
-        }
-      },
-      {
-        id: 4,
-        name: 'Student Two',
-        email: 'student2@mitcorer.edu.in',
-        role: 'STUDENT',
-        passwordHash: hashPassword('Student@123'),
-        is_active: true,
-        created_at: new Date().toISOString(),
-        student_profile: {
-          id: 4,
-          roll_number: 'MIT-2023-ETC-018',
-          prn: 'PRN2023002',
-          department_id: 2,
-          department_code: 'E&TC',
-          department_name: 'Electronics & Telecommunication',
-          year: 'BE',
-          cgpa: 9.12
-        }
       }
     ],
     posts: getDefaultCommunityPosts(),
@@ -1081,7 +1043,7 @@ function getInitialStore(): DataStore {
       const baseline = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
       if (Array.isArray(baseline.users)) {
         // Exclude soft-deleted/stale students on cold start
-        const activeStudents = baseline.users.filter((u: UserRecord) => u.is_active !== false);
+        const activeStudents = baseline.users.filter((u: any) => u.is_active !== false);
         return {
           ...baseline,
           users: activeStudents
@@ -1089,10 +1051,11 @@ function getInitialStore(): DataStore {
       }
       return baseline;
     } catch (err) {
-      console.warn('[DB] Could not parse baseline data file, using default store:', err);
+      console.warn('[DB] Could not parse baseline data file, returning empty store:', err);
+      return { users: [] };
     }
   }
-  return getDefaultStore();
+  return { users: [] };
 }
 
 function normalizeDepartmentInfo(deptInput: any, deptCodeInput?: any): { id: number; code: string; name: string } {
@@ -1203,28 +1166,6 @@ function loadStore(): DataStore {
       const parsed = JSON.parse(fs.readFileSync(fileToLoad, 'utf-8'));
       let modified = false;
       if (!Array.isArray(parsed.users)) { parsed.users = []; modified = true; }
-      if (!parsed.users.some((u: any) => u.email === 'student1@mitcorer.edu.in')) {
-        parsed.users.push({
-          id: 3,
-          name: 'Student One',
-          email: 'student1@mitcorer.edu.in',
-          role: 'STUDENT',
-          passwordHash: hashPassword('Student@123'),
-          is_active: true,
-          created_at: new Date().toISOString(),
-          student_profile: {
-            id: 3,
-            roll_number: 'MIT-2023-CS-042',
-            prn: 'PRN2023001',
-            department_id: 1,
-            department_code: 'CSE',
-            department_name: 'Computer Science & Engineering',
-            year: 'TE',
-            cgpa: 8.85
-          }
-        });
-        modified = true;
-      }
       if (!Array.isArray(parsed.applications)) { parsed.applications = []; modified = true; }
       if (!Array.isArray(parsed.tasks)) { parsed.tasks = []; modified = true; }
       if (!Array.isArray(parsed.resumes)) { parsed.resumes = []; modified = true; }
