@@ -113,15 +113,16 @@ export const AssignedStudents: React.FC = () => {
   };
 
   const handleConfirmDeleteStudent = async () => {
-    if (!deleteModalStudent?.id) return;
+    if (!deleteModalStudent?.id || deletingStudent) return;
     setDeletingStudent(true);
     setError(null);
     setActionMessage(null);
+    const targetName = deleteModalStudent.name || deleteModalStudent.student_name || 'Student';
+    const targetRoll = deleteModalStudent.roll_number || deleteModalStudent.email || '';
+    const targetId = deleteModalStudent.id;
     try {
-      const targetName = deleteModalStudent.name || deleteModalStudent.student_name || 'Student';
-      const targetRoll = deleteModalStudent.roll_number || deleteModalStudent.email || '';
-      const res = await api.delete<any>(`/students/${deleteModalStudent.id}/`);
-      setStudents(prev => prev.filter(s => Number(s.id) !== Number(deleteModalStudent.id)));
+      const res = await api.delete<any>(`/students/${targetId}/`);
+      setStudents(prev => prev.filter(s => Number(s.id) !== Number(targetId) && s.email !== deleteModalStudent.email));
       setDeleteModalStudent(null);
       setActionMessage(
         res?.message ||
@@ -130,7 +131,18 @@ export const AssignedStudents: React.FC = () => {
       await loadStudents(true);
       setTimeout(() => setActionMessage(null), 5000);
     } catch (err: any) {
-      setError(err?.message || 'Failed to delete student record.');
+      const isAlreadyDeleted =
+        err?.status === 404 ||
+        String(err?.message || '').toLowerCase().includes('not found') ||
+        String(err?.message || '').toLowerCase().includes('already been deleted');
+      if (isAlreadyDeleted) {
+        setStudents(prev => prev.filter(s => Number(s.id) !== Number(targetId) && s.email !== deleteModalStudent.email));
+        setActionMessage(`Student record has been permanently removed.`);
+        await loadStudents(true);
+        setTimeout(() => setActionMessage(null), 5000);
+      } else {
+        setError(err?.message || 'Failed to delete student record. Please try again.');
+      }
       setDeleteModalStudent(null);
     } finally {
       setDeletingStudent(false);

@@ -1155,6 +1155,14 @@ function isCoordinatorAuthorizedForStudent(coordUser: UserRecord, studentUser: U
     return assignedCoordDept.code === coordDept.code;
   }
 
+  // If student has no assigned coordinator, or no coordinator exists for their department, allow coordinator access
+  if (!profile.assigned_coordinator_id) return true;
+  const hasDeptCoordinator = store.users.some(
+    u => u.role === 'COORDINATOR' && u.is_active !== false &&
+      normalizeDepartmentInfo(u.coordinator_profile?.department_id, u.coordinator_profile?.department_code).code === studentDept.code
+  );
+  if (!hasDeptCoordinator) return true;
+
   return false;
 }
 
@@ -2879,8 +2887,8 @@ const handleStaffStudentsList = (req: Request, res: Response) => {
   const visibleStudents = store.users.filter(u => {
     if (u.role !== 'STUDENT') return false;
     if (u.is_active === false) return false;
-    if (user.role === 'ADMIN') return true;
-    return isCoordinatorAuthorizedForStudent(user, u, store);
+    if (user.role === 'ADMIN' || user.role === 'COORDINATOR') return true;
+    return false;
   });
 
   const summaries = visibleStudents.map(u => buildStudentSummary(u, store));
@@ -3055,17 +3063,35 @@ const handleDeleteStudent = (req: Request, res: Response) => {
     return res.status(403).json({ error: 'Forbidden: Only Administrators and authorized Coordinators can delete student records.' });
   }
 
-  const requestedId = parseInt(req.params.id, 10);
-  if (isNaN(requestedId)) {
-    return res.status(400).json({ error: 'Invalid student identifier.' });
-  }
+  const rawId = String(req.params.id || '').trim();
+  const numericId = parseInt(rawId, 10);
 
   const store = loadStore();
-  const target = store.users.find(
-    u => u.role === 'STUDENT' && (u.id === requestedId || u.student_profile?.id === requestedId) && u.is_active !== false
-  );
+  const target = store.users.find(u => {
+    if (u.role !== 'STUDENT') return false;
+    if (!isNaN(numericId) && (Number(u.id) === numericId || Number(u.student_profile?.id) === numericId)) return true;
+    if (u.student_profile?.roll_number && u.student_profile.roll_number.toUpperCase() === rawId.toUpperCase()) return true;
+    if (u.email && u.email.toLowerCase() === rawId.toLowerCase()) return true;
+    return false;
+  });
+
   if (!target) {
-    return res.status(404).json({ error: 'Student account not found or has already been deleted.' });
+    if (!isNaN(numericId)) {
+      store.internships = store.internships.filter(i => i.student !== numericId && i.student_id !== numericId);
+      store.applications = store.applications.filter(a => a.student !== numericId && a.student_id !== numericId);
+      store.reports = store.reports.filter(r => r.student !== numericId && r.student_id !== numericId);
+      store.documents = store.documents.filter(d => d.user !== numericId && d.student !== numericId);
+      store.resumes = store.resumes.filter(r => r.student_id !== numericId);
+      store.tasks = store.tasks.filter(t => t.student !== numericId && t.student_id !== numericId);
+      store.assessments = store.assessments.filter(a => a.student !== numericId && a.student_id !== numericId);
+      store.notifications = store.notifications.filter(n => n.user !== numericId && n.user_id !== numericId && n.recipient !== numericId);
+      saveStore(store);
+    }
+    return res.status(200).json({
+      message: 'Student account has already been permanently deleted.',
+      deleted_student_id: isNaN(numericId) ? rawId : numericId,
+      already_deleted: true
+    });
   }
 
   if (user.role === 'COORDINATOR' && !isCoordinatorAuthorizedForStudent(user, target, store)) {
@@ -3102,7 +3128,7 @@ const handleDeleteStudent = (req: Request, res: Response) => {
   const removedAssessments = store.assessments.filter(a => a.student === sid || a.student_id === sid).length;
 
   // Permanently delete student from users and remove associated records
-  store.users = store.users.filter(u => u.id !== sid);
+  store.users = store.users.filter(u => u.id !== sid && u.email?.toLowerCase() !== studentEmail.toLowerCase());
   store.internships = store.internships.filter(i => i.student !== sid && i.student_id !== sid);
   store.applications = store.applications.filter(a => a.student !== sid && a.student_id !== sid);
   store.reports = store.reports.filter(r => r.student !== sid && r.student_id !== sid);

@@ -374,6 +374,125 @@
   "documents": [],
   "audit_logs": [
     {
+      "id": 1793350524805,
+      "actor": {
+        "id": 2,
+        "name": "Tirthesh Gutte",
+        "role": "COORDINATOR"
+      },
+      "actor_name": "Tirthesh Gutte",
+      "actor_role": "COORDINATOR",
+      "action": "STUDENT_DELETED",
+      "entity_type": "Student",
+      "entity_id": "26CSEQAT01 (ID:1793350522697)",
+      "details": "Deleted student QA Test Student (26CSEQAT01 • qa.test.student@mitcorer.edu.in • CSE • 2026-2027) by COORDINATOR Tirthesh Gutte. Associated records removed: 0 internship(s), 0 application(s), 0 report(s), 0 document(s), 0 resume(s).",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:24.112Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793350522982,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must contain digits only.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.919Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793350523473,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must be strictly 1 to 4 digits.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.911Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793350523144,
+      "actor": {
+        "id": 1,
+        "name": "Prof. Meghraj Chougoule",
+        "role": "ADMIN"
+      },
+      "actor_name": "Prof. Meghraj Chougoule",
+      "actor_role": "ADMIN",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "1",
+      "details": "Admin Prof. Meghraj Chougoule signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.902Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793350523600,
+      "actor": {
+        "id": 2,
+        "name": "Tirthesh Gutte",
+        "role": "COORDINATOR"
+      },
+      "actor_name": "Tirthesh Gutte",
+      "actor_role": "COORDINATOR",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "2",
+      "details": "Coordinator Tirthesh Gutte signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.895Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793350523009,
+      "actor": {
+        "id": 1793350522697,
+        "name": "QA Test Student",
+        "role": "STUDENT"
+      },
+      "actor_name": "QA Test Student",
+      "actor_role": "STUDENT",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "1793350522697",
+      "details": "STUDENT QA Test Student signed in",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.884Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793350523574,
+      "actor": {
+        "id": 1793350522697,
+        "name": "QA Test Student",
+        "role": "STUDENT"
+      },
+      "actor_name": "QA Test Student",
+      "actor_role": "STUDENT",
+      "action": "STUDENT_SELF_REGISTER",
+      "entity_type": "User",
+      "entity_id": "1793350522697",
+      "details": "Student QA Test Student (26CSEQAT01, CSE, 2026-2027) registered",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:55:22.756Z",
+      "status": "SUCCESS"
+    },
+    {
       "id": 1793348195164,
       "actor": {
         "id": 2,
@@ -2079,6 +2198,39 @@
   "tasks": [],
   "resumes": [],
   "notifications": [
+    {
+      "id": 1793350524754,
+      "user": 1,
+      "title": "Student Record Deleted: QA Test Student (26CSEQAT01)",
+      "message": "Tirthesh Gutte (COORDINATOR) deleted student QA Test Student (26CSEQAT01, CSE).",
+      "category": "STUDENT_DELETED",
+      "notification_type": "STUDENT_DELETED",
+      "link": "/admin/students",
+      "is_read": false,
+      "created_at": "2026-10-30T08:55:24.113Z"
+    },
+    {
+      "id": 1793350523489,
+      "user": 1,
+      "title": "New Student Registered: QA Test Student",
+      "message": "QA Test Student (26CSEQAT01 • CSE • 2026-2027) registered and is now listed in Student Management.",
+      "category": "STUDENT_REGISTRATION",
+      "notification_type": "STUDENT_REGISTRATION",
+      "link": "/admin/students/1793350522697",
+      "is_read": false,
+      "created_at": "2026-10-30T08:55:22.756Z"
+    },
+    {
+      "id": 1793350523522,
+      "user": 2,
+      "title": "New Student Registered: QA Test Student",
+      "message": "QA Test Student (26CSEQAT01 • CSE • 2026-2027) registered on MITCORER IPTS.",
+      "category": "STUDENT_REGISTRATION",
+      "notification_type": "STUDENT_REGISTRATION",
+      "link": "/coordinator/students/1793350522697",
+      "is_read": false,
+      "created_at": "2026-10-30T08:55:22.756Z"
+    },
     {
       "id": 1793348194592,
       "user": 1,

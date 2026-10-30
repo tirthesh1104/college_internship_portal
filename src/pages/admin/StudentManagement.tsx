@@ -105,15 +105,16 @@ export const StudentManagement: React.FC = () => {
   };
 
   const handleConfirmDeleteStudent = async () => {
-    if (!deleteModalStudent?.id) return;
+    if (!deleteModalStudent?.id || deletingStudent) return;
     setDeletingStudent(true);
     setErrorMsg(null);
     setActionSuccess(null);
+    const targetName = deleteModalStudent.student_name || deleteModalStudent.name || 'Student';
+    const targetRoll = deleteModalStudent.roll_number || deleteModalStudent.email || '';
+    const targetId = deleteModalStudent.id;
     try {
-      const targetName = deleteModalStudent.student_name || deleteModalStudent.name || 'Student';
-      const targetRoll = deleteModalStudent.roll_number || deleteModalStudent.email || '';
-      const res = await api.delete<any>(`/students/${deleteModalStudent.id}/`);
-      setStudents(prev => prev.filter(s => Number(s.id) !== Number(deleteModalStudent.id)));
+      const res = await api.delete<any>(`/students/${targetId}/`);
+      setStudents(prev => prev.filter(s => Number(s.id) !== Number(targetId) && s.email !== deleteModalStudent.email));
       setDeleteModalStudent(null);
       setActionSuccess(
         res?.message ||
@@ -122,7 +123,18 @@ export const StudentManagement: React.FC = () => {
       await loadStudents(true);
       setTimeout(() => setActionSuccess(null), 5000);
     } catch (err: any) {
-      setErrorMsg(err?.message || 'Failed to delete student record.');
+      const isAlreadyDeleted =
+        err?.status === 404 ||
+        String(err?.message || '').toLowerCase().includes('not found') ||
+        String(err?.message || '').toLowerCase().includes('already been deleted');
+      if (isAlreadyDeleted) {
+        setStudents(prev => prev.filter(s => Number(s.id) !== Number(targetId) && s.email !== deleteModalStudent.email));
+        setActionSuccess(`Student record has already been removed.`);
+        await loadStudents(true);
+        setTimeout(() => setActionSuccess(null), 5000);
+      } else {
+        setErrorMsg(err?.message || 'Failed to delete student record. Please try again.');
+      }
       setDeleteModalStudent(null);
     } finally {
       setDeletingStudent(false);
