@@ -27,86 +27,6 @@
         "phone": "+91 9876543210",
         "can_publish_directly": true
       }
-    },
-    {
-      "id": 1793136604186,
-      "name": "Verification Student 4183",
-      "email": "verify.4183@mitcorer.edu.in",
-      "role": "STUDENT",
-      "passwordHash": "scrypt$a08093e5fde5bf292f24973d14ce6d02$b2b503b371ea5240f68a0dbcc42a583b87f0685459cea0a5cb2e6a97f5c1275daf66b3cc206a2fb73c899f13b0227692026220652d63dc2c171f1107bb2b637c",
-      "is_active": true,
-      "created_at": "2026-10-27T21:30:04.272Z",
-      "student_profile": {
-        "id": 1793136604273,
-        "roll_number": "26CSE4183",
-        "prn_number": "PRN20264183",
-        "department_id": 1,
-        "department_code": "CSE",
-        "department_name": "Computer Science & Engineering",
-        "academic_year": "2026-2027",
-        "admission_year": "2026",
-        "graduation_year": "2030",
-        "registration_date": "2026-10-27",
-        "division": "A",
-        "semester": 6,
-        "cgpa": "0.00",
-        "skills": [],
-        "assigned_coordinator_id": 2,
-        "assigned_coordinator_name": "Tirthesh Gutte",
-        "is_verified": true
-      }
-    },
-    {
-      "id": 1793161149098,
-      "name": "Aarav Kulkarni",
-      "email": "aarav.kulkarni@mitcorer.edu.in",
-      "role": "STUDENT",
-      "passwordHash": "scrypt$4c12737f2d0283b18cb5ac92a530f5f0$132fac1cbf5ca7edecc402c368bb3a9c1d444e7e3709120931715a6ee084d54f5f90343aa34db3e4fa33a27fb1db13bf9e5c150ebfa2ca7278510f0ed79ca8ce",
-      "is_active": true,
-      "created_at": "2026-10-28T04:19:09.203Z",
-      "student_profile": {
-        "id": 1793161149204,
-        "roll_number": "26CSE4201",
-        "prn_number": "PRN20264201",
-        "department_id": 1,
-        "department_code": "CSE",
-        "department_name": "Computer Science & Engineering",
-        "academic_year": "2026-2027",
-        "admission_year": "2026",
-        "graduation_year": "2030",
-        "registration_date": "2026-10-28",
-        "division": "A",
-        "semester": 6,
-        "cgpa": "0.00",
-        "skills": [],
-        "assigned_coordinator_id": 2,
-        "assigned_coordinator_name": "Tirthesh Gutte",
-        "is_verified": true
-      }
-    },
-    {
-      "id": 3,
-      "name": "Student One",
-      "email": "student1@mitcorer.edu.in",
-      "role": "STUDENT",
-      "passwordHash": "scrypt$d6afc143b3ab60a600e539d041efb841$5b840c17e45b88823010418bf4fc429ea0b19c0da669fec8d868af7fd71744d52550d58e09b88ccf99faa86ef32a5dcf19e882eb6258514b981c02b17938dcbd",
-      "is_active": true,
-      "created_at": "2026-10-28T14:36:05.542Z",
-      "student_profile": {
-        "id": 3,
-        "roll_number": "MIT-2023-CS-042",
-        "prn": "PRN2023001",
-        "department_id": 1,
-        "department_code": "CSE",
-        "department_name": "Computer Science & Engineering",
-        "year": "TE",
-        "cgpa": 8.85,
-        "academic_year": "2026-2027",
-        "division": "A",
-        "is_verified": true,
-        "assigned_coordinator_id": 2,
-        "assigned_coordinator_name": "Tirthesh Gutte"
-      }
     }
   ],
   "posts": [
@@ -165,22 +85,7 @@
       "max_members": 4,
       "status": "RECRUITING",
       "created_by": 4,
-      "members": [
-        {
-          "id": 1,
-          "student": 4,
-          "student_name": "Aarav Kulkarni",
-          "role": "Project Lead",
-          "joined_at": "2026-10-30T04:59:19.782Z"
-        },
-        {
-          "id": 2,
-          "student": 3,
-          "student_name": "Student One",
-          "role": "IoT Firmware Engineer",
-          "joined_at": "2026-10-30T04:59:19.782Z"
-        }
-      ],
+      "members": [],
       "created_at": "2026-10-30T04:59:19.782Z"
     },
     {
@@ -469,21 +374,208 @@
   "documents": [],
   "audit_logs": [
     {
-      "id": 1793252775600,
+      "id": 1793348195164,
       "actor": {
-        "id": 3,
-        "name": "Student One",
+        "id": 2,
+        "name": "Tirthesh Gutte",
+        "role": "COORDINATOR"
+      },
+      "actor_name": "Tirthesh Gutte",
+      "actor_role": "COORDINATOR",
+      "action": "STUDENT_DELETED",
+      "entity_type": "Student",
+      "entity_id": "26CSEQAT01 (ID:1793348192531)",
+      "details": "Deleted student QA Test Student (26CSEQAT01 • qa.test.student@mitcorer.edu.in • CSE • 2026-2027) by COORDINATOR Tirthesh Gutte. Associated records removed: 0 internship(s), 0 application(s), 0 report(s), 0 document(s), 0 resume(s).",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:34.352Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793348193116,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must contain digits only.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:32.818Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793348193188,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must be strictly 1 to 4 digits.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:32.807Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793348193284,
+      "actor": {
+        "id": 1,
+        "name": "Prof. Meghraj Chougoule",
+        "role": "ADMIN"
+      },
+      "actor_name": "Prof. Meghraj Chougoule",
+      "actor_role": "ADMIN",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "1",
+      "details": "Admin Prof. Meghraj Chougoule signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:32.799Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793348193340,
+      "actor": {
+        "id": 2,
+        "name": "Tirthesh Gutte",
+        "role": "COORDINATOR"
+      },
+      "actor_name": "Tirthesh Gutte",
+      "actor_role": "COORDINATOR",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "2",
+      "details": "Coordinator Tirthesh Gutte signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:32.791Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793348193680,
+      "actor": {
+        "id": 1793348192531,
+        "name": "QA Test Student",
         "role": "STUDENT"
       },
-      "actor_name": "Student One",
+      "actor_name": "QA Test Student",
       "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "MOCK_INTERVIEW",
-      "details": "Executed AI request via Google Gemini (gemini-3.1-flash-lite) for STUDENT Student One",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "1793348192531",
+      "details": "STUDENT QA Test Student signed in",
       "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T05:46:15.464Z",
+      "created_at": "2026-10-30T08:16:32.774Z",
       "status": "SUCCESS"
+    },
+    {
+      "id": 1793348193290,
+      "actor": {
+        "id": 1793348192531,
+        "name": "QA Test Student",
+        "role": "STUDENT"
+      },
+      "actor_name": "QA Test Student",
+      "actor_role": "STUDENT",
+      "action": "STUDENT_SELF_REGISTER",
+      "entity_type": "User",
+      "entity_id": "1793348192531",
+      "details": "Student QA Test Student (26CSEQAT01, CSE, 2026-2027) registered",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T08:16:32.603Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793345222463,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must contain digits only.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T07:27:02.086Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793345222691,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "ADMIN_PIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "ADMIN",
+      "details": "Failed Admin Security PIN verification attempt: Admin Security PIN must be strictly 1 to 4 digits.",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T07:27:02.081Z",
+      "status": "FAILED"
+    },
+    {
+      "id": 1793345222945,
+      "actor": {
+        "id": 1,
+        "name": "Prof. Meghraj Chougoule",
+        "role": "ADMIN"
+      },
+      "actor_name": "Prof. Meghraj Chougoule",
+      "actor_role": "ADMIN",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "1",
+      "details": "Admin Prof. Meghraj Chougoule signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T07:27:02.075Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793345222532,
+      "actor": {
+        "id": 2,
+        "name": "Tirthesh Gutte",
+        "role": "COORDINATOR"
+      },
+      "actor_name": "Tirthesh Gutte",
+      "actor_role": "COORDINATOR",
+      "action": "USER_LOGIN",
+      "entity_type": "Auth",
+      "entity_id": "2",
+      "details": "Coordinator Tirthesh Gutte signed in via verified PIN",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T07:27:02.068Z",
+      "status": "SUCCESS"
+    },
+    {
+      "id": 1793345222754,
+      "actor": {
+        "id": 0,
+        "name": "Unauthenticated Client",
+        "role": "GUEST"
+      },
+      "actor_name": "Unauthenticated Client",
+      "actor_role": "GUEST",
+      "action": "LOGIN_FAILED",
+      "entity_type": "Auth",
+      "entity_id": "student1@mitcorer.edu.in",
+      "details": "Failed login attempt for email student1@mitcorer.edu.in",
+      "ip_address": "127.0.0.1",
+      "created_at": "2026-10-30T07:27:02.033Z",
+      "status": "FAILED"
     },
     {
       "id": 1793252774655,
@@ -503,23 +595,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793252646488,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T05:44:06.181Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793252646708,
       "actor": {
         "id": 1,
@@ -534,210 +609,6 @@
       "details": "ADMIN Prof. Meghraj Chougoule signed in",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-29T05:44:06.086Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249758981,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "TECHNICAL_QUIZ",
-      "details": "Executed AI request via Google Gemini (gemini-3.1-flash-lite) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:55:58.610Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249758540,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "GITHUB_PORTFOLIO",
-      "details": "Executed AI request via Google Gemini (gemini-3.1-flash-lite) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:55:57.855Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249756964,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:55:56.898Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249609854,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "CAREER_ROADMAP",
-      "details": "Executed AI request via Google Gemini (gemini-3.1-flash-lite) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:53:29.679Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249599689,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "RESUME_ANALYZER",
-      "details": "Executed AI request via Google Gemini (gemini-3.8-flash) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:53:18.833Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249344527,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "MOCK_INTERVIEW",
-      "details": "Executed AI request via Google Gemini (gemini-3.1-flash-lite) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:49:04.186Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249336979,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:48:56.814Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793249033143,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_FAILED",
-      "entity_type": "AIFeature",
-      "entity_id": "TECHNICAL_QUIZ",
-      "details": "AI generation error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:43:53.046Z",
-      "status": "FAILED"
-    },
-    {
-      "id": 1793249025256,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_EXECUTED",
-      "entity_type": "AIFeature",
-      "entity_id": "CAREER_ROADMAP",
-      "details": "Executed AI request via Google Gemini (gemini-3.8-flash) for STUDENT Student One",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:43:45.196Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793248910039,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_FAILED",
-      "entity_type": "AIFeature",
-      "entity_id": "RESUME_ANALYZER",
-      "details": "AI generation error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:41:49.404Z",
-      "status": "FAILED"
-    },
-    {
-      "id": 1793248907302,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "AI_INFERENCE_FAILED",
-      "entity_type": "AIFeature",
-      "entity_id": "MOCK_INTERVIEW",
-      "details": "AI generation error: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:41:46.576Z",
-      "status": "FAILED"
-    },
-    {
-      "id": 1793248901004,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-29T04:41:40.161Z",
       "status": "SUCCESS"
     },
     {
@@ -1472,74 +1343,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793198182441,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "FEEDBACK_RESPONSE_ADDED",
-      "entity_type": "FeedbackRecord",
-      "entity_id": "FB-2026-1001",
-      "details": "Added response note on feedback FB-2026-1001",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-28T14:36:22.007Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793198182727,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-28T14:36:21.981Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793198173947,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-28T14:36:13.834Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793198166040,
-      "actor": {
-        "id": 3,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "USER_LOGIN",
-      "entity_type": "Auth",
-      "entity_id": "3",
-      "details": "STUDENT Student One signed in",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-28T14:36:05.613Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793198083745,
       "actor": {
         "id": 0,
@@ -1710,23 +1513,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793161149868,
-      "actor": {
-        "id": 1793161149098,
-        "name": "Aarav Kulkarni",
-        "role": "STUDENT"
-      },
-      "actor_name": "Aarav Kulkarni",
-      "actor_role": "STUDENT",
-      "action": "STUDENT_SELF_REGISTER",
-      "entity_type": "User",
-      "entity_id": "1793161149098",
-      "details": "Student Aarav Kulkarni (26CSE4201, CSE, 2026-2027) registered",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-28T04:19:09.204Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793161149656,
       "actor": {
         "id": 2,
@@ -1812,57 +1598,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793137046105,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "PASSWORD_CHANGED",
-      "entity_type": "User",
-      "entity_id": "1793137045122",
-      "details": "STUDENT Verification Test Student updated account password",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.445Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793137045820,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "PROFILE_UPDATED",
-      "entity_type": "User",
-      "entity_id": "1793137045122",
-      "details": "STUDENT Verification Test Student updated profile settings",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.305Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793137046010,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "COMMUNITY_POST_CREATED",
-      "entity_type": "CommunityPost",
-      "entity_id": "1793137045296",
-      "details": "Posted \"RDSO Signalling Lab Experience\" in INTERNSHIP_EXPERIENCE",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.296Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793137045826,
       "actor": {
         "id": 1,
@@ -1914,23 +1649,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793137046022,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "DOCUMENT_UPLOADED",
-      "entity_type": "Document",
-      "entity_id": "1793137045268",
-      "details": "Uploaded COMPLETION_CERTIFICATE: RDSO Internship Offer & Completion Certificate",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.268Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793137045844,
       "actor": {
         "id": 2,
@@ -1948,23 +1666,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793137046173,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "WEEKLY_REPORT_SUBMITTED",
-      "entity_type": "Report",
-      "entity_id": "1793137045259",
-      "details": "Submitted Week 1 report (SUBMITTED)",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.259Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793137046012,
       "actor": {
         "id": 2,
@@ -1979,23 +1680,6 @@
       "details": "Marked application by Verification Test Student for Verification Railway Signalling Intern as SELECTED",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-27T21:37:25.251Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793137045250,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "OPPORTUNITY_APPLIED",
-      "entity_type": "Application",
-      "entity_id": "1793137045245",
-      "details": "Applied to Verification Railway Signalling Intern at Indian Railways RDSO",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.245Z",
       "status": "SUCCESS"
     },
     {
@@ -2064,23 +1748,6 @@
       "details": "Assigned Verification Test Student to Coordinator Tirthesh Gutte",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-27T21:37:25.220Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793137045525,
-      "actor": {
-        "id": 1793137045122,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "STUDENT_SELF_REGISTER",
-      "entity_type": "User",
-      "entity_id": "1793137045122",
-      "details": "Student Verification Test Student (MIT-VER-5118, 2026-2027) registered",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:37:25.213Z",
       "status": "SUCCESS"
     },
     {
@@ -2186,23 +1853,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793136858619,
-      "actor": {
-        "id": 1793136858271,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "DOCUMENT_UPLOADED",
-      "entity_type": "Document",
-      "entity_id": "1793136858423",
-      "details": "Uploaded COMPLETION_CERTIFICATE: RDSO Internship Offer & Completion Certificate",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:34:18.423Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793136858996,
       "actor": {
         "id": 2,
@@ -2220,23 +1870,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793136858704,
-      "actor": {
-        "id": 1793136858271,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "WEEKLY_REPORT_SUBMITTED",
-      "entity_type": "Report",
-      "entity_id": "1793136858413",
-      "details": "Submitted Week 1 report (SUBMITTED)",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:34:18.413Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793136858506,
       "actor": {
         "id": 2,
@@ -2251,23 +1884,6 @@
       "details": "Marked application by Verification Test Student for Verification Railway Signalling Intern as SELECTED",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-27T21:34:18.402Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793136858874,
-      "actor": {
-        "id": 1793136858271,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "OPPORTUNITY_APPLIED",
-      "entity_type": "Application",
-      "entity_id": "1793136858392",
-      "details": "Applied to Verification Railway Signalling Intern at Indian Railways RDSO",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:34:18.392Z",
       "status": "SUCCESS"
     },
     {
@@ -2336,23 +1952,6 @@
       "details": "Assigned Verification Test Student to Coordinator Tirthesh Gutte",
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-27T21:34:18.363Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793136858581,
-      "actor": {
-        "id": 1793136858271,
-        "name": "Verification Test Student",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Test Student",
-      "actor_role": "STUDENT",
-      "action": "STUDENT_SELF_REGISTER",
-      "entity_type": "User",
-      "entity_id": "1793136858271",
-      "details": "Student Verification Test Student (MIT-VER-8266, 2026-2027) registered",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:34:18.351Z",
       "status": "SUCCESS"
     },
     {
@@ -2441,40 +2040,6 @@
       "status": "SUCCESS"
     },
     {
-      "id": 1793136604396,
-      "actor": {
-        "id": 2,
-        "name": "Tirthesh Gutte",
-        "role": "COORDINATOR"
-      },
-      "actor_name": "Tirthesh Gutte",
-      "actor_role": "COORDINATOR",
-      "action": "STUDENT_COORDINATOR_ASSIGNED",
-      "entity_type": "User",
-      "entity_id": "1793136604186",
-      "details": "Assigned Verification Student 4183 to Coordinator Tirthesh Gutte",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:30:04.280Z",
-      "status": "SUCCESS"
-    },
-    {
-      "id": 1793136604966,
-      "actor": {
-        "id": 1793136604186,
-        "name": "Verification Student 4183",
-        "role": "STUDENT"
-      },
-      "actor_name": "Verification Student 4183",
-      "actor_role": "STUDENT",
-      "action": "STUDENT_SELF_REGISTER",
-      "entity_type": "User",
-      "entity_id": "1793136604186",
-      "details": "Student Verification Student 4183 (26CSE4183, 2026-2027) registered",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T21:30:04.272Z",
-      "status": "SUCCESS"
-    },
-    {
       "id": 1793136604810,
       "actor": {
         "id": 1,
@@ -2507,22 +2072,6 @@
       "ip_address": "127.0.0.1",
       "created_at": "2026-10-27T21:30:04.174Z",
       "status": "SUCCESS"
-    },
-    {
-      "id": 1793118495875,
-      "actor": {
-        "id": 1793118495873,
-        "name": "Student One",
-        "role": "STUDENT"
-      },
-      "actor_name": "Student One",
-      "actor_role": "STUDENT",
-      "action": "STUDENT_SELF_REGISTER",
-      "entity_type": "User",
-      "entity_id": "1793118495873",
-      "ip_address": "127.0.0.1",
-      "created_at": "2026-10-27T16:28:15.873Z",
-      "status": "SUCCESS"
     }
   ],
   "assessments": [],
@@ -2531,237 +2080,37 @@
   "resumes": [],
   "notifications": [
     {
-      "id": 1793244792250,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1004]",
-      "message": "Prof. Meghraj Chougoule submitted BUG feedback: \"Temp Verification Ticket\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-29T03:33:11.897Z"
-    },
-    {
-      "id": 1793204802543,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1006]",
-      "message": "Tirthesh Gutte submitted GENERAL feedback: \"Spam / Test Ticket to Delete\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:26:42.517Z"
-    },
-    {
-      "id": 1793204791777,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1005]",
-      "message": "Tirthesh Gutte submitted GENERAL feedback: \"Spam / Test Ticket to Delete\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:26:31.654Z"
-    },
-    {
-      "id": 1793204784067,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1004]",
-      "message": "Tirthesh Gutte submitted GENERAL feedback: \"Spam / Test Ticket to Delete\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:26:24.014Z"
-    },
-    {
-      "id": 1793203422275,
-      "user": 2,
-      "title": "Feedback Status Updated [FB-2026-1005]",
-      "message": "Status changed to RESOLVED for \"Temporary Test Feedback for Delete Verification\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/student/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:03:41.660Z"
-    },
-    {
-      "id": 1793203421777,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1005]",
-      "message": "Tirthesh Gutte submitted GENERAL feedback: \"Temporary Test Feedback for Delete Verification\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:03:41.654Z"
-    },
-    {
-      "id": 1793203391551,
-      "user": 2,
-      "title": "Feedback Status Updated [FB-2026-1004]",
-      "message": "Status changed to RESOLVED for \"Temporary Test Feedback for Delete Verification\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/student/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:03:10.716Z"
-    },
-    {
-      "id": 1793203391447,
-      "user": 2,
-      "title": "New Feedback [FB-2026-1004]",
-      "message": "Tirthesh Gutte submitted GENERAL feedback: \"Temporary Test Feedback for Delete Verification\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/coordinator/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T16:03:10.710Z"
-    },
-    {
-      "id": 1793199281540,
-      "user": 3,
-      "title": "New Update on Feedback [FB-2026-1001]",
-      "message": "Tirthesh Gutte responded to your feedback: \"PDF Certificate Download Issue on Mobile\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/student/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T14:54:41.256Z"
-    },
-    {
-      "id": 1793199270251,
-      "user": 3,
-      "title": "Feedback Status Updated [FB-2026-1001]",
-      "message": "Status changed to UNDER_REVIEW for \"PDF Certificate Download Issue on Mobile\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/student/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T14:54:30.016Z"
-    },
-    {
-      "id": 1793199261487,
-      "user": 3,
-      "title": "Feedback Status Updated [FB-2026-1001]",
-      "message": "Status changed to UNDER_REVIEW for \"PDF Certificate Download Issue on Mobile\"",
-      "category": "FEEDBACK",
-      "notification_type": "FEEDBACK",
-      "link": "/student/feedback",
-      "is_read": false,
-      "created_at": "2026-10-28T14:54:20.669Z"
-    },
-    {
-      "id": 1793161150027,
+      "id": 1793348194592,
       "user": 1,
-      "title": "New Student Registered: Aarav Kulkarni",
-      "message": "Aarav Kulkarni (26CSE4201 • CSE • 2026-2027) registered and is now listed in Student Management.",
-      "category": "STUDENT_REGISTRATION",
-      "notification_type": "STUDENT_REGISTRATION",
-      "link": "/admin/students/1793161149098",
+      "title": "Student Record Deleted: QA Test Student (26CSEQAT01)",
+      "message": "Tirthesh Gutte (COORDINATOR) deleted student QA Test Student (26CSEQAT01, CSE).",
+      "category": "STUDENT_DELETED",
+      "notification_type": "STUDENT_DELETED",
+      "link": "/admin/students",
       "is_read": false,
-      "created_at": "2026-10-28T04:19:09.204Z"
+      "created_at": "2026-10-30T08:16:34.352Z"
     },
     {
-      "id": 1793161149854,
+      "id": 1793348192660,
+      "user": 1,
+      "title": "New Student Registered: QA Test Student",
+      "message": "QA Test Student (26CSEQAT01 • CSE • 2026-2027) registered and is now listed in Student Management.",
+      "category": "STUDENT_REGISTRATION",
+      "notification_type": "STUDENT_REGISTRATION",
+      "link": "/admin/students/1793348192531",
+      "is_read": false,
+      "created_at": "2026-10-30T08:16:32.603Z"
+    },
+    {
+      "id": 1793348193423,
       "user": 2,
-      "title": "New Student Registered: Aarav Kulkarni",
-      "message": "Aarav Kulkarni (26CSE4201 • CSE • 2026-2027) registered on MITCORER IPTS.",
+      "title": "New Student Registered: QA Test Student",
+      "message": "QA Test Student (26CSEQAT01 • CSE • 2026-2027) registered on MITCORER IPTS.",
       "category": "STUDENT_REGISTRATION",
       "notification_type": "STUDENT_REGISTRATION",
-      "link": "/coordinator/students/1793161149098",
+      "link": "/coordinator/students/1793348192531",
       "is_read": false,
-      "created_at": "2026-10-28T04:19:09.203Z"
-    },
-    {
-      "id": 1793137045321,
-      "user": 1793137045122,
-      "title": "New Reply on \"RDSO Signalling Lab Experience\"",
-      "message": "Tirthesh Gutte (COORDINATOR) replied to your community discussion: \"Great initiative! Approved and pinned by department coordinator.\"",
-      "category": "COMMUNITY_REPLY",
-      "is_read": false,
-      "created_at": "2026-10-27T21:37:25.300Z"
-    },
-    {
-      "id": 1793137045878,
-      "user": 1793137045122,
-      "title": "Document Verified: RDSO Internship Offer & Completion Certificate",
-      "message": "Tirthesh Gutte verified your COMPLETION_CERTIFICATE (RDSO Internship Offer & Completion Certificate). QR Verification Key: MIT-QR-CBF099C3",
-      "category": "DOCUMENT_VERIFICATION",
-      "is_read": false,
-      "created_at": "2026-10-27T21:37:25.273Z"
-    },
-    {
-      "id": 1793137046005,
-      "user": 1793137045122,
-      "title": "Week 1 Report APPROVED",
-      "message": "Tirthesh Gutte reviewed your Week 1 report (Score: 92/100): \"Excellent Week 1 technical depth and safety verification.\"",
-      "category": "REPORT_REVIEW",
-      "is_read": false,
-      "created_at": "2026-10-27T21:37:25.263Z"
-    },
-    {
-      "id": 1793137045622,
-      "user": 1793137045122,
-      "title": "Application Status Updated: SELECTED",
-      "message": "Your application for \"Verification Railway Signalling Intern\" at Indian Railways RDSO has been marked as SELECTED by Tirthesh Gutte: \"Strong technical profile. Approved for RDSO internship.\"",
-      "category": "APPLICATION_STATUS",
-      "is_read": false,
-      "created_at": "2026-10-27T21:37:25.251Z"
-    },
-    {
-      "id": 1793137045327,
-      "user": 1793137045122,
-      "title": "Faculty Coordinator Assigned: Tirthesh Gutte",
-      "message": "Tirthesh Gutte (CSE) is now your assigned Internship Faculty Coordinator.",
-      "category": "COORDINATOR_ASSIGNED",
-      "is_read": false,
-      "created_at": "2026-10-27T21:37:25.220Z"
-    },
-    {
-      "id": 1793136858958,
-      "user": 1793136858271,
-      "title": "Document Verified: RDSO Internship Offer & Completion Certificate",
-      "message": "Tirthesh Gutte verified your COMPLETION_CERTIFICATE (RDSO Internship Offer & Completion Certificate). QR Verification Key: MIT-QR-08F44D7B",
-      "category": "DOCUMENT_VERIFICATION",
-      "is_read": false,
-      "created_at": "2026-10-27T21:34:18.427Z"
-    },
-    {
-      "id": 1793136858558,
-      "user": 1793136858271,
-      "title": "Week 1 Report APPROVED",
-      "message": "Tirthesh Gutte reviewed your Week 1 report (Score: 92/100): \"Excellent Week 1 technical depth and safety verification.\"",
-      "category": "REPORT_REVIEW",
-      "is_read": false,
-      "created_at": "2026-10-27T21:34:18.417Z"
-    },
-    {
-      "id": 1793136859253,
-      "user": 1793136858271,
-      "title": "Application Status Updated: SELECTED",
-      "message": "Your application for \"Verification Railway Signalling Intern\" at Indian Railways RDSO has been marked as SELECTED by Tirthesh Gutte: \"Strong technical profile. Approved for RDSO internship.\"",
-      "category": "APPLICATION_STATUS",
-      "is_read": false,
-      "created_at": "2026-10-27T21:34:18.402Z"
-    },
-    {
-      "id": 1793136858720,
-      "user": 1793136858271,
-      "title": "Faculty Coordinator Assigned: Tirthesh Gutte",
-      "message": "Tirthesh Gutte (CSE) is now your assigned Internship Faculty Coordinator.",
-      "category": "COORDINATOR_ASSIGNED",
-      "is_read": false,
-      "created_at": "2026-10-27T21:34:18.363Z"
-    },
-    {
-      "id": 1793136604900,
-      "user": 1793136604186,
-      "title": "Faculty Coordinator Assigned: Tirthesh Gutte",
-      "message": "Tirthesh Gutte (CSE) is now your assigned Internship Faculty Coordinator.",
-      "category": "COORDINATOR_ASSIGNED",
-      "is_read": false,
-      "created_at": "2026-10-27T21:30:04.280Z"
+      "created_at": "2026-10-30T08:16:32.602Z"
     }
   ],
   "academic_config": {
@@ -2818,57 +2167,6 @@
   },
   "feedback": [
     {
-      "id": "fb_1001",
-      "feedback_code": "FB-2026-1001",
-      "user_id": 3,
-      "user_name": "Student One",
-      "user_email": "student1@mitcorer.edu.in",
-      "user_role": "STUDENT",
-      "department": "Computer Science & Engineering",
-      "department_code": "CSE",
-      "category": "BUG",
-      "overall_rating": 4,
-      "usability_rating": 3,
-      "performance_rating": 4,
-      "design_rating": 5,
-      "affected_page": "Certificates & Documents",
-      "subject": "PDF Certificate Download Issue on Mobile",
-      "description": "When attempting to view or download verified internship completion certificates on a mobile browser, the PDF preview modal gets cropped at the bottom edge.",
-      "attachment_url": "",
-      "status": "UNDER_REVIEW",
-      "assigned_coordinator_id": 2,
-      "assigned_coordinator_name": "Tirthesh Gutte",
-      "responses": [
-        {
-          "id": "res_101",
-          "user_id": 2,
-          "user_name": "Tirthesh Gutte",
-          "user_role": "COORDINATOR",
-          "message": "We investigated the issue with the mobile viewport layout. Working on an update for the certificate rendering canvas.",
-          "created_at": "2026-10-27T10:30:00.000Z"
-        },
-        {
-          "id": "res_102",
-          "user_id": 3,
-          "user_name": "Student One",
-          "user_role": "STUDENT",
-          "message": "Thank you sir, looking forward to the update.",
-          "created_at": "2026-10-27T11:15:00.000Z"
-        },
-        {
-          "id": "res_103",
-          "user_id": 2,
-          "user_name": "Tirthesh Gutte",
-          "user_role": "COORDINATOR",
-          "message": "Fix has been staged in the document viewer container styling.",
-          "created_at": "2026-10-27T14:00:00.000Z"
-        }
-      ],
-      "linked_feedback_ids": [],
-      "created_at": "2026-10-27T08:00:00.000Z",
-      "updated_at": "2026-10-27T14:00:00.000Z"
-    },
-    {
       "id": "fb_1002",
       "feedback_code": "FB-2026-1002",
       "user_id": 2,
@@ -2902,42 +2200,6 @@
       "linked_feedback_ids": [],
       "created_at": "2026-10-27T14:31:03.740Z",
       "updated_at": "2026-10-27T14:31:03.740Z"
-    },
-    {
-      "id": "fb_1003",
-      "feedback_code": "FB-2026-1003",
-      "user_id": 4,
-      "user_name": "Student Two",
-      "user_email": "student2@mitcorer.edu.in",
-      "user_role": "STUDENT",
-      "department": "Electronics & Telecommunication",
-      "department_code": "E&TC",
-      "category": "UX",
-      "overall_rating": 5,
-      "usability_rating": 5,
-      "performance_rating": 5,
-      "design_rating": 5,
-      "affected_page": "AI Career Assistant & Mentor Connect",
-      "subject": "Excellent AI Resume Analyzer & Mock Interview Experience!",
-      "description": "The AI Resume analyzer and role-specific mock interview questions have been extremely helpful in preparing for Persistent Systems and Tech Mahindra campus drives.",
-      "attachment_url": "",
-      "status": "RESOLVED",
-      "assigned_coordinator_id": 2,
-      "assigned_coordinator_name": "Tirthesh Gutte",
-      "responses": [
-        {
-          "id": "res_1003_1",
-          "user_id": 2,
-          "user_name": "Tirthesh Gutte",
-          "user_role": "COORDINATOR",
-          "message": "Glad to hear that! Keep leveraging the AI Assistant for campus placements.",
-          "created_at": "2026-10-28T14:31:03.740Z"
-        }
-      ],
-      "linked_feedback_ids": [],
-      "created_at": "2026-10-21T14:31:03.740Z",
-      "updated_at": "2026-10-28T14:31:03.740Z",
-      "resolved_at": "2026-10-28T14:31:03.740Z"
     }
   ],
   "mentors": [

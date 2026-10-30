@@ -4,6 +4,12 @@
  * This file bridges Vercel's serverless infrastructure and the Express app.
  */
 
+// Explicitly mark environment as Vercel serverless runtime
+process.env.VERCEL = '1';
+if (!process.env.VERCEL_ENV) {
+  process.env.VERCEL_ENV = 'production';
+}
+
 import fs from 'fs';
 import path from 'path';
 

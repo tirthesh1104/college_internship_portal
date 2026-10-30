@@ -74,7 +74,9 @@ export const AssignedStudents: React.FC = () => {
         setAvailableAcademicYears(acadCfg.available_academic_years);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load students');
+      if (!silent) {
+        setError(err instanceof Error ? err.message : 'Failed to load students');
+      }
     } finally {
       if (!silent) setLoading(false);
     }

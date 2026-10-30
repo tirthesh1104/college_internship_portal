@@ -13,7 +13,15 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const IS_VERCEL = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+const IS_VERCEL = Boolean(
+  process.env.VERCEL ||
+  process.env.VERCEL_ENV ||
+  process.env.VERCEL_REGION ||
+  process.env.AWS_LAMBDA_FUNCTION_NAME ||
+  process.env.LAMBDA_TASK_ROOT ||
+  (typeof process.cwd === 'function' && process.cwd().startsWith('/var/task')) ||
+  (typeof __dirname === 'string' && __dirname.startsWith('/var/task'))
+);
 const candidateSeedPaths = [
   path.join(__dirname, 'data', 'db_store.json'),
   path.join(__dirname, '..', 'data', 'db_store.json'),
@@ -120,8 +128,22 @@ if (IS_VERCEL && !fs.existsSync(DATA_FILE) && fs.existsSync(SEED_DATA_FILE)) {
 // ============================================================================
 // DURABLE PERSISTENCE ADAPTER (Vercel KV / Upstash Redis / Remote REST DB)
 // ============================================================================
-const KV_URL = (process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || '').replace(/\/$/, '');
-const KV_TOKEN = (process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || '').trim();
+const KV_URL = (
+  process.env.KV_REST_API_URL ||
+  process.env.UPSTASH_REDIS_REST_URL ||
+  process.env.VERCEL_KV_REST_API_URL ||
+  process.env.VERCEL_KV_API_URL ||
+  process.env.REDIS_REST_API_URL ||
+  ''
+).replace(/\/$/, '');
+const KV_TOKEN = (
+  process.env.KV_REST_API_TOKEN ||
+  process.env.UPSTASH_REDIS_REST_TOKEN ||
+  process.env.VERCEL_KV_REST_API_TOKEN ||
+  process.env.VERCEL_KV_API_TOKEN ||
+  process.env.REDIS_REST_API_TOKEN ||
+  ''
+).trim();
 const HAS_DURABLE_STORAGE = Boolean(KV_URL && KV_TOKEN);
 let durableStoreLoaded = false;
 let pendingSavePromise: Promise<void> | null = null;
@@ -1052,10 +1074,10 @@ function getInitialStore(): DataStore {
       return baseline;
     } catch (err) {
       console.warn('[DB] Could not parse baseline data file, returning empty store:', err);
-      return { users: [] };
+      return getDefaultStore();
     }
   }
-  return { users: [] };
+  return getDefaultStore();
 }
 
 function normalizeDepartmentInfo(deptInput: any, deptCodeInput?: any): { id: number; code: string; name: string } {
@@ -3079,8 +3101,8 @@ const handleDeleteStudent = (req: Request, res: Response) => {
   const removedTasks = store.tasks.filter(t => t.student === sid || t.student_id === sid).length;
   const removedAssessments = store.assessments.filter(a => a.student === sid || a.student_id === sid).length;
 
-  // Soft delete student: set is_active = false so account is inactive and does not reappear on cold start
-  store.users = store.users.map(u => u.id === sid ? { ...u, is_active: false } : u);
+  // Permanently delete student from users and remove associated records
+  store.users = store.users.filter(u => u.id !== sid);
   store.internships = store.internships.filter(i => i.student !== sid && i.student_id !== sid);
   store.applications = store.applications.filter(a => a.student !== sid && a.student_id !== sid);
   store.reports = store.reports.filter(r => r.student !== sid && r.student_id !== sid);
@@ -3088,7 +3110,7 @@ const handleDeleteStudent = (req: Request, res: Response) => {
   store.resumes = store.resumes.filter(r => r.student_id !== sid);
   store.tasks = store.tasks.filter(t => t.student !== sid && t.student_id !== sid);
   store.assessments = store.assessments.filter(a => a.student !== sid && a.student_id !== sid);
-  store.notifications = store.notifications.filter(n => n.user_id !== sid && n.recipient !== sid);
+  store.notifications = store.notifications.filter(n => n.user !== sid && n.user_id !== sid && n.recipient !== sid);
 
   const summaryDetails = `Deleted student ${studentName} (${rollNumber} • ${studentEmail} • ${deptInfo.code} • ${academicYear}) by ${user.role} ${user.name}. Associated records removed: ${removedInternships} internship(s), ${removedApplications} application(s), ${removedReports} report(s), ${removedDocuments} document(s), ${removedResumes} resume(s).`;
 
