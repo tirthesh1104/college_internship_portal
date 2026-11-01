@@ -1,17 +1,32 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UserCheck, CheckCircle2, 
-  Layers, BarChart2, ShieldAlert, User, LogOut, Menu, X, Cpu, MessageSquare
+  Layers, BarChart2, ShieldAlert, User, LogOut, Menu, X, Cpu, MessageSquare, Bell
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { Logo } from '../components/common/Logo';
 import { ThemeToggle } from '../components/common/ThemeToggle';
+import { api } from '../services/api';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    api.get<any[]>('/notifications/')
+      .then((list) => {
+        if (active && Array.isArray(list)) {
+          setUnreadCount(list.filter((n) => !n.is_read).length);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -33,6 +48,13 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="app-container">
+      {mobileMenuOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="brand-box">
           <Logo width={38} height={38} style={{ flexShrink: 0 }} />
@@ -68,7 +90,7 @@ export const AdminLayout: React.FC = () => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontWeight: 700, fontSize: '13px', flexShrink: 0
             }}>
-              A
+              {user?.name?.charAt(0) || 'A'}
             </div>
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -93,8 +115,9 @@ export const AdminLayout: React.FC = () => {
         <header className="topbar">
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', padding: '6px' }}
             className="mobile-toggle"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -107,6 +130,14 @@ export const AdminLayout: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <ThemeToggle />
+            <Link to="/admin/audit-logs" style={{ color: 'var(--text-secondary)', position: 'relative', display: 'inline-flex', alignItems: 'center' }} title="Notifications">
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-6px', background: '#dc2626', color: '#fff', fontSize: '0.65rem', fontWeight: 700, padding: '1px 5px', borderRadius: '999px', lineHeight: 1.2 }}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
             <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <LogOut size={14} /> Log Out
             </button>

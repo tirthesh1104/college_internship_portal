@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, CheckCircle, FileText, PlusCircle, 
   Award, FileCheck, CheckSquare, BarChart3, Bell, User, LogOut, Menu, X,
@@ -8,11 +8,26 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { Logo } from '../components/common/Logo';
 import { ThemeToggle } from '../components/common/ThemeToggle';
+import { api } from '../services/api';
 
 export const ManagementLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    api.get<any[]>('/notifications/')
+      .then((list) => {
+        if (active && Array.isArray(list)) {
+          setUnreadCount(list.filter((n) => !n.is_read).length);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -45,6 +60,13 @@ export const ManagementLayout: React.FC = () => {
 
   return (
     <div className="app-container">
+      {mobileMenuOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       {/* Sidebar Navigation */}
       <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="brand-box">
@@ -106,9 +128,10 @@ export const ManagementLayout: React.FC = () => {
       <div className="main-content">
         <header className="topbar">
           <button
-            className="btn btn-outline mobile-menu-btn"
+            className="mobile-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ padding: '6px 10px', display: 'none' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', padding: '6px' }}
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -121,6 +144,18 @@ export const ManagementLayout: React.FC = () => {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <ThemeToggle />
+            <Link
+              to={isAdmin ? '/management/audit-logs' : '/management/profile'}
+              style={{ color: 'var(--text-secondary)', position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+              title="Notifications"
+            >
+              <Bell size={20} />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: '-5px', right: '-6px', background: '#dc2626', color: '#fff', fontSize: '0.65rem', fontWeight: 700, padding: '1px 5px', borderRadius: '999px', lineHeight: 1.2 }}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </Link>
             <span className={`badge ${isAdmin ? 'badge-primary' : 'badge-published'}`}>
               {isAdmin ? 'Institutional Admin' : 'Department Coordinator'}
             </span>

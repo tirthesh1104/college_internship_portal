@@ -29,6 +29,8 @@ export interface StudentProfile {
   linkedin_url?: string;
   portfolio_url?: string;
   is_verified: boolean;
+  assigned_coordinator_id?: number | null;
+  assigned_coordinator_name?: string | null;
 }
 
 export interface CoordinatorProfile {

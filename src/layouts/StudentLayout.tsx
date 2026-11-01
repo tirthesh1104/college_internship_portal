@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, Briefcase, BookOpen, Send, CalendarCheck, 
   FileText, TrendingUp, CheckSquare, Award, FileCheck2, 
@@ -9,11 +9,26 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { Logo } from '../components/common/Logo';
 import { ThemeToggle } from '../components/common/ThemeToggle';
+import { api } from '../services/api';
 
 export const StudentLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    api.get<any[]>('/notifications/')
+      .then((list) => {
+        if (active && Array.isArray(list)) {
+          setUnreadCount(list.filter((n) => !n.is_read).length);
+        }
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -46,6 +61,14 @@ export const StudentLayout: React.FC = () => {
 
   return (
     <div className="app-container">
+      {/* Mobile overlay — clicking it closes the sidebar */}
+      {mobileMenuOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       {/* Sidebar Navigation */}
       <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="brand-box">
@@ -108,8 +131,9 @@ export const StudentLayout: React.FC = () => {
         <header className="topbar">
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)' }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-primary)', padding: '6px' }}
             className="mobile-toggle"
+            aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -129,10 +153,16 @@ export const StudentLayout: React.FC = () => {
             <ThemeToggle />
             <Link to="/student/notifications" style={{ position: 'relative', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
               <Bell size={20} />
-              <span style={{
-                position: 'absolute', top: '-4px', right: '-4px', width: '8px', height: '8px',
-                borderRadius: '50%', backgroundColor: 'var(--danger)'
-              }}></span>
+              {unreadCount > 0 && (
+                <span style={{
+                  position: 'absolute', top: '-5px', right: '-6px',
+                  background: '#dc2626', color: '#fff',
+                  fontSize: '0.65rem', fontWeight: 700, padding: '1px 5px',
+                  borderRadius: '999px', lineHeight: 1.2
+                }}>
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
             </Link>
             <button onClick={handleLogout} className="btn btn-secondary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <LogOut size={14} /> Log Out

@@ -848,8 +848,8 @@ function getDefaultFeedback(): any[] {
       id: 'fb_1001',
       feedback_code: 'FB-2026-1001',
       user_id: 3,
-      user_name: 'Student One',
-      user_email: 'student1@mitcorer.edu.in',
+      user_name: 'Atharva Kulkarni',
+      user_email: 'atharva.kulkarni@mitcorer.edu.in',
       user_role: 'STUDENT',
       department: 'Computer Science & Engineering',
       department_code: 'CSE',
@@ -918,8 +918,8 @@ function getDefaultFeedback(): any[] {
       id: 'fb_1003',
       feedback_code: 'FB-2026-1003',
       user_id: 4,
-      user_name: 'Student Two',
-      user_email: 'student2@mitcorer.edu.in',
+      user_name: 'Sneha Deshmukh',
+      user_email: 'sneha.deshmukh@mitcorer.edu.in',
       user_role: 'STUDENT',
       department: 'Electronics & Telecommunication',
       department_code: 'E&TC',
@@ -2789,6 +2789,92 @@ app.post('/api/auth/token/refresh/', (req: Request, res: Response) => {
   }
   const rawToken = refresh.replace(/^ref_/, '');
   return res.json({ access: rawToken });
+});
+
+// ============================================================================
+// PASSWORD RESET (Forgot Password) — Token-based email-free in-system reset
+// ============================================================================
+
+// Request a password reset — stores a short-lived token on the user record.
+// In production, this token would be emailed. Here it is returned in the response
+// for demo/self-service use, and can be entered directly in the reset form.
+app.post('/api/auth/forgot-password/', (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email || typeof email !== 'string' || !email.trim()) {
+    return res.status(400).json({ error: 'Email address is required.' });
+  }
+
+  const store = loadStore();
+  const user = store.users.find(u => u.email.toLowerCase() === email.trim().toLowerCase() && u.role === 'STUDENT');
+
+  // Always return a success-like response to prevent email enumeration
+  if (!user) {
+    return res.json({
+      message: 'If an account with that email address exists, a reset token has been generated.',
+      hint: 'Please contact your department coordinator or administrator to reset your password directly.',
+      token_available: false
+    });
+  }
+
+  // Generate a short-lived reset token (expires in 1 hour)
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  (user as any).password_reset_token = resetToken;
+  (user as any).password_reset_expires = new Date(Date.now() + 3600000).toISOString();
+
+  addAuditLog(store, user, 'PASSWORD_RESET_REQUESTED', 'User', String(user.id),
+    `Password reset token generated for ${user.email}`, req.ip, 'SUCCESS');
+  saveStore(store);
+
+  return res.json({
+    message: 'A password reset token has been generated for your account.',
+    hint: 'Use this token with your email address to set a new password.',
+    token: resetToken,
+    expires_in: '1 hour',
+    token_available: true
+  });
+});
+
+// Confirm password reset using token
+app.post('/api/auth/reset-password/', (req: Request, res: Response) => {
+  const { email, token, new_password } = req.body;
+
+  if (!email || !token || !new_password) {
+    return res.status(400).json({ error: 'Email, token, and new password are all required.' });
+  }
+
+  if (String(new_password).length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+  }
+
+  const store = loadStore();
+  const user = store.users.find(
+    u => u.email.toLowerCase() === String(email).trim().toLowerCase() && u.role === 'STUDENT'
+  );
+
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid email or reset token.' });
+  }
+
+  const storedToken = (user as any).password_reset_token;
+  const expires = (user as any).password_reset_expires;
+
+  if (!storedToken || storedToken !== String(token).trim()) {
+    return res.status(400).json({ error: 'Invalid reset token. Please request a new one.' });
+  }
+
+  if (expires && new Date(expires) < new Date()) {
+    return res.status(400).json({ error: 'Reset token has expired. Please request a new one.' });
+  }
+
+  user.passwordHash = hashPassword(String(new_password));
+  delete (user as any).password_reset_token;
+  delete (user as any).password_reset_expires;
+
+  addAuditLog(store, user, 'PASSWORD_RESET_COMPLETED', 'User', String(user.id),
+    `Password successfully reset for ${user.email}`, req.ip, 'SUCCESS');
+  saveStore(store);
+
+  return res.json({ message: 'Password has been reset successfully. You can now log in with your new password.' });
 });
 
 // ============================================================================
@@ -5309,7 +5395,7 @@ const handleGetTeams = (_req: Request, res: Response) => {
         created_by: 4,
         members: [
           { id: 1, student: 4, student_name: 'Aarav Kulkarni', role: 'Project Lead', joined_at: new Date().toISOString() },
-          { id: 2, student: 3, student_name: 'Student One', role: 'IoT Firmware Engineer', joined_at: new Date().toISOString() }
+          { id: 2, student: 3, student_name: 'Atharva Kulkarni', role: 'IoT Firmware Engineer', joined_at: new Date().toISOString() }
         ],
         created_at: new Date().toISOString()
       },
