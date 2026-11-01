@@ -22,15 +22,12 @@ useEffect(() => {
           return;
         }
 
-      Promise.all([
+        const [repData, skillData] = await Promise.all([
           api.get<ProgressReport[] | { results: ProgressReport[] }>('/reports/'),
           api.get<SkillAssessment[] | { results: SkillAssessment[] }>('/assessments/records/'),
-        ])
-        .then(([repData, skillData]) => {
-          setReports(Array.isArray(repData) ? repData : repData.results || []);
-          setSkills(Array.isArray(skillData) ? skillData : skillData.results || []);
-        })
-        .catch((err) => console.error(err));
+        ]);
+        setReports(Array.isArray(repData) ? repData : (repData as any).results || []);
+        setSkills(Array.isArray(skillData) ? skillData : (skillData as any).results || []);
       } catch (err) {
         console.error('Performance tracker fetch error:', err);
         setReports([]);
